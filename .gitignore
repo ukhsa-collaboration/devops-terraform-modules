@@ -1,0 +1,44 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Ignore any .tfvars files that are generated automatically for each deployment
+*.tfvars
+
+# Ignore override files as they can contain sensitive details and be used for local configuration
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# Exclude any compiled files or binaries
+*.tfplan
+*.backup
+
+# Ignore IntelliJ IDE related files
+.idea/
+
+# Ignore VSCode directory
+.vscode/
+
+# Ignore MacOS files
+.DS_Store
+
+# Ignore Terraform .lock.hcl
+.terraform.lock.hcl
+
+# If using Terragrunt, you may also want to exclude its files
+# terragrunt-cache/
+
+# If you have secrets stored in files, make sure they are ignored - this is just an example and you should adapt it for your setup
+# secrets.json

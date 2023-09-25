@@ -1,5 +1,5 @@
 module "tags" {
-  source      = "./terraform-modules/tags"
+  source      = "../../terraform-modules/tags"
   project     = var.project
   client      = var.client
   owner       = var.owner
@@ -10,7 +10,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "./terraform-modules/subnet"
+  source = "../../terraform-modules/subnet"
 
   name               = var.name
   vpc_id             = var.vpc_id
@@ -21,7 +21,7 @@ module "subnets" {
 
 
 module "ec2_instance" {
-  source = "./terraform-modules/ec2-autoscale"
+  source = "../../terraform-modules/ec2-autoscale"
 
   name                 = var.name
   ami                  = var.ec2_ami
@@ -62,7 +62,7 @@ module "ec2_instance" {
 }
 
 module "load_balancer" {
-  source = "./terraform-modules/load-balancer"
+  source = "../../terraform-modules/load-balancer"
   name   = var.name
 
   certificate_arn = module.domain_routing.acm_certificate_arn
@@ -136,7 +136,7 @@ module "load_balancer" {
 }
 
 module "domain_routing" {
-  source = "./terraform-modules/domain-routing"
+  source = "../../terraform-modules/domain-routing"
 
   name                  = var.name
   vpc_id                = var.vpc_id

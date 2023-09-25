@@ -14,6 +14,11 @@ This Terraform module provides functionalities to manage an AWS Application Load
 - Configurable Security Group rules for ingress and egress.
 - Outputs for referencing Load Balancer, Target Groups, Listeners, and Security Group details.
 
+## Dependencies/Requirements
+
+- Terraform v0.x.x (Specify the required version)
+- AWS Provider v0.x.x (Specify the required version)
+
 ## Usage
 
 ```hcl
@@ -59,18 +64,12 @@ output "alb_arn" {
 | `egress_rules`    | Egress rules for security group                    | `list(object)` | `[]`    | no       |
 | `tags`            | Tags for resources                                 | `map(string)`  | `{}`    | yes      |
 
-Each of the object types for `target_groups`, `listeners`, `ingress_rules`, and `egress_rules` come with their own sub-parameters. They are as follows:
+Detailed parameters for `target_groups`, `listeners`, `ingress_rules`, and `egress_rules` are mentioned below:
 
 ### Target Groups
-- `port`: The port where the service is accessible.
-- `protocol`: The protocol used.
-- `health_check`: Object containing:
-  - `matcher`: The HTTP response codes.
-  - `path`: The destination for the health check request.
-  - `interval`: The duration in seconds between health checks.
-  
- *For Example*:
- ```hcl
+
+*For Example*:
+```hcl
   target_groups = [
     {
       port     = 443
@@ -83,35 +82,37 @@ Each of the object types for `target_groups`, `listeners`, `ingress_rules`, and 
     }
   ]
 ```
+
 ### Listeners
 - `port`: The port where the service is accessible.
 - `protocol`: The protocol used.
 - `action_type`: The type of routing action.
 
- *For Example*:
- ```hcl
-  listeners = [
-    {
-      port        = 80
-      protocol    = "HTTP"
-      action_type = "forward"
-    },
-    {
-      port        = 443
-      protocol    = "HTTPS"
-      action_type = "forward"
-    }
-  ]
+*For Example*:
+```hcl
+listeners = [
+  {
+    port        = 80
+    protocol    = "HTTP"
+    action_type = "forward"
+  },
+  {
+    port        = 443
+    protocol    = "HTTPS"
+    action_type = "forward"
+  }
+]
 ```
 
 ### Ingress Rules
+
 - `from_port`: Starting port of the rule.
 - `to_port`: Ending port of the rule.
 - `protocol`: Protocol type.
 - `cidr_blocks`: IP ranges.
 - `security_groups`: List of security groups.
 
- *For Example*:
+*For Example*:
 ```hcl
   ingress_rules = [
     {
@@ -122,7 +123,6 @@ Each of the object types for `target_groups`, `listeners`, `ingress_rules`, and 
     }
   ]
 ```
-
 ### Egress Rules
 - `from_port`: Starting port of the rule.
 - `to_port`: Ending port of the rule.
@@ -130,14 +130,14 @@ Each of the object types for `target_groups`, `listeners`, `ingress_rules`, and 
 - `cidr_blocks`: IP ranges.
 
 ```hcl
-  egress_rules = [
-    {
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  ]
+egress_rules = [
+  {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+]
 ```
 
 ## Outputs
@@ -149,4 +149,4 @@ Each of the object types for `target_groups`, `listeners`, `ingress_rules`, and 
 | `load_balancer_zone_id` | Canonical hosted zone ID of the Application Load Balancer |
 | `target_group_arns`     | The ARNs of the target groups                   |
 | `listener_arns`         | The ARNs of the listeners                       |
-| `security_group_id`     | The ID of the Security Group                    |
+| `security_group_id`     | The ID of the Security Group    

@@ -41,14 +41,21 @@ variable "target_groups" {
 #   Listener Config    #
 ########################
 variable "listeners" {
-  description = "List of listener configurations"
+  description = "The list of listeners for the load balancer"
   type = list(object({
-    port        = number
-    protocol    = string
-    action_type = string
+    port     = number
+    protocol = string
+    actions  = list(object({
+      type               = string
+      target_group_arn   = optional(string)
+      redirect_port      = optional(string)
+      redirect_protocol  = optional(string)
+      status_code        = optional(string)
+    }))
   }))
   default = []
 }
+
 
 ########################
 # Security Group Rules #
@@ -74,6 +81,15 @@ variable "egress_rules" {
     cidr_blocks = list(string)
   }))
   default = []
+}
+
+########################
+#     Certifacte       #
+########################
+variable "certificate_arn" {
+  description = " SSL/TLS certificate arn"
+  type        = string
+  default = null
 }
 
 ########################

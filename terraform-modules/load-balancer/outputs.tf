@@ -21,12 +21,12 @@ output "load_balancer_zone_id" {
 
 output "target_group_arns" {
   description = "The ARNs of the target groups"
-  value       = aws_lb_target_group.target_group[*].arn
+  value       = aws_lb_target_group.target_group.*.arn
 }
 
 output "listener_arns" {
   description = "The ARNs of the listeners"
-  value       = aws_lb_listener.listener[*].arn
+  value       = [for k, v in aws_lb_listener.listener : v.arn]
 }
 
 output "security_group_id" {

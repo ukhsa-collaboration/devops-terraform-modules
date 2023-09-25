@@ -2,7 +2,7 @@
 #     Naming Config      #
 ##########################
 module "resource_name_prefix" {
-  source = "../resource_name_prefix"
+  source = "../resource-name-prefix"
 
   name                 = var.name
   tags = var.tags
@@ -38,17 +38,31 @@ resource "aws_lb_target_group" "target_group" {
 }
 
 resource "aws_lb_listener" "listener" {
-  count             = length(var.listeners)
+  for_each          = { for i in var.listeners : "${i.port}-${i.protocol}" => i }
   load_balancer_arn = aws_alb.application_load_balancer.arn
-  port              = var.listeners[count.index].port
-  protocol          = var.listeners[count.index].protocol
+  port              = each.value.port
+  protocol          = each.value.protocol
+  certificate_arn   = each.value.protocol == "HTTPS" ? var.certificate_arn : null
 
-  default_action {
-    type             = var.listeners[count.index].action_type
-    target_group_arn = aws_lb_target_group.target_group[count.index].arn
+  dynamic "default_action" {
+    for_each = each.value.actions
+    content {
+      type = default_action.value["type"]
+
+      dynamic "redirect" {
+        for_each = default_action.value["type"] == "redirect" ? [default_action.value] : []
+        content {
+          port        = redirect.value["redirect_port"]
+          protocol    = redirect.value["redirect_protocol"]
+          status_code = redirect.value["status_code"]
+        }
+      }
+
+      target_group_arn = lookup(default_action.value, "target_group_arn", null)
+    }
   }
 
-  tags = merge(var.tags, { "Name" = "${module.resource_name_prefix.resource_name}-${count.index + 1}-lb-listener" })
+  tags = merge(var.tags, { "Name" = "${module.resource_name_prefix.resource_name}-${each.key}-lb-listener" })
 }
 
 ##########################

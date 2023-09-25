@@ -14,11 +14,6 @@ This Terraform module provides functionalities to manage an AWS Application Load
 - Configurable Security Group rules for ingress and egress.
 - Outputs for referencing Load Balancer, Target Groups, Listeners, and Security Group details.
 
-## Dependencies/Requirements
-
-- Terraform v0.x.x (Specify the required version)
-- AWS Provider v0.x.x (Specify the required version)
-
 ## Usage
 
 ```hcl

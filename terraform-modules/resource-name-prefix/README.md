@@ -2,6 +2,10 @@
 
 This Terraform module provides functionalities to manage the naming configuration of resources in AWS. It combines the given base name with the provided tags (specifically `Project` and `Environment`) to generate a consistent naming prefix.
 
+## Prerequisites
+
+- **Terraform Tags Module**: Before using the `load-balancer` module, you must integrate the [Terraform Tags Module](../tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
+
 ## Features
 
 - Automated resource naming prefix generation based on base name, project, and environment tags.

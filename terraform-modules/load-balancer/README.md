@@ -4,7 +4,7 @@ This Terraform module provides functionalities to manage an AWS Application Load
 
 ## Prerequisites
 
-- **Terraform Tags Module**: Before using the `load-balancer` module, you must integrate the [Terraform Tags Module](<LINK_TO_TAGS_MODULE_REPOSITORY>) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
+- **Terraform Tags Module**: Before using the `load-balancer` module, you must integrate the [Terraform Tags Module](../tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
 
 ## Features
 

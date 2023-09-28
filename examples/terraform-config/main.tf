@@ -160,4 +160,12 @@ module "domain_routing" {
   tags = module.tags.tags
 }
 
+module "cognito_test" {
+  source = "../../terraform-modules/cognito-user-pool"
+
+  name                  = var.name
+
+  tags = module.tags.tags
+}
+
 

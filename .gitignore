@@ -42,3 +42,10 @@ terraform.rc
 
 # If you have secrets stored in files, make sure they are ignored - this is just an example and you should adapt it for your setup
 # secrets.json
+
+# CDK TF
+cdktf.out
+cdktf.log
+examples/CDK-terraform-config/dist/
+examples/CDK-terraform-config/imports/*
+examples/CDK-terraform-config/!imports/__init__.py

@@ -161,11 +161,46 @@ module "domain_routing" {
 }
 
 module "cognito_test" {
-  source = "../../terraform-modules/cognito-user-pool"
+  source = "../../terraform-modules/cognito"
 
   name                  = var.name
+  lambda_auth_challenge_arn  = "arn:aws:lambda:eu-west-2:975276445027:function:streamlit-poc-cognito-pre-signup"
+  password_min_length        = 12
+  temp_password_validity_days = 7
+  token_validity             = 1
+  callback_url               = "https://iac-streamlit-poc.qap-ukhsa.uk/oauth2/idpresponse"
+
+  schema = [
+    {
+      attribute_data_type      = "String"
+      developer_only_attribute = false
+      mutable                  = true
+      name                     = "email"
+      required                 = true
+    }
+  ]
+  
+  recovery_mechanism = [
+    {
+      name     = "verified_email"
+      priority = 1
+    }
+  ]
+
+  explicit_auth_flows = [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+
+  allowed_oauth_scopes = [
+    "email",
+    "openid"
+  ]
+
+  supported_identity_providers = ["COGNITO"]
+
+  allowed_oauth_flows = ["code"]
 
   tags = module.tags.tags
 }
-
 

@@ -67,3 +67,8 @@ resource "aws_cognito_user_pool_client" "client" {
   allowed_oauth_scopes = var.allowed_oauth_scopes
   allowed_oauth_flows = var.allowed_oauth_flows
 }
+
+resource "aws_cognito_user_pool_domain" "main" {
+  domain       = var.domain
+  user_pool_id = aws_cognito_user_pool.cognito_user_pool.id
+}

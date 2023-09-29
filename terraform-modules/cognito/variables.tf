@@ -78,6 +78,11 @@ variable "allowed_oauth_flows" {
   default     = ["code"]
 }
 
+variable "domain" {
+  description = "The omain name."
+  type        = string
+}
+
 ########################
 #      Tags Config     #
 ########################

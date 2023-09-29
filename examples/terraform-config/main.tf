@@ -169,6 +169,7 @@ module "cognito_test" {
   temp_password_validity_days = 7
   token_validity             = 1
   callback_url               = "https://iac-streamlit-poc.qap-ukhsa.uk/oauth2/idpresponse"
+  domain = var.subdomain_prefix
 
   schema = [
     {

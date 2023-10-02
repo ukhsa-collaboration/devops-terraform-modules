@@ -1,6 +1,6 @@
 output "ec2_asg_name" {
   description = "Name of the EC2 Auto Scaling Group"
-  value       = module.ec2_instance.autoscaling_group_name
+  value       = module.ec2_autoscale.autoscaling_group_name
 }
 
 output "application_load_balancer_dns_name" {

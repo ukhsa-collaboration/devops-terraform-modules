@@ -33,9 +33,9 @@ variable "load_balancer_zone_id" {
 variable "routes" {
   description = "List of maps containing routes configurations."
   type = list(object({
-    cidr_block       = string
-    gateway_id       = optional(string)
-    nat_gateway_id   = optional(string)
+    cidr_block     = string
+    gateway_id     = optional(string)
+    nat_gateway_id = optional(string)
   }))
   default = []
 }

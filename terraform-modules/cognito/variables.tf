@@ -37,7 +37,7 @@ variable "callback_url" {
 
 variable "schema" {
   description = "Schema definition for the Cognito User Pool"
-  type        = list(object({
+  type = list(object({
     attribute_data_type      = string
     developer_only_attribute = bool
     mutable                  = bool
@@ -48,7 +48,7 @@ variable "schema" {
 
 variable "recovery_mechanism" {
   description = "Account recovery settings for the Cognito User Pool"
-  type        = list(object({
+  type = list(object({
     name     = string
     priority = number
   }))

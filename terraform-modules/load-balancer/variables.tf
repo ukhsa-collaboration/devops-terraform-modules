@@ -45,12 +45,12 @@ variable "listeners" {
   type = list(object({
     port     = number
     protocol = string
-    actions  = list(object({
-      type               = string
-      target_group_arn   = optional(string)
-      redirect_port      = optional(string)
-      redirect_protocol  = optional(string)
-      status_code        = optional(string)
+    actions = list(object({
+      type              = string
+      target_group_arn  = optional(string)
+      redirect_port     = optional(string)
+      redirect_protocol = optional(string)
+      status_code       = optional(string)
     }))
   }))
   default = []
@@ -65,16 +65,16 @@ variable "listener_rules" {
     listener_port = number
     protocol      = string
     priority      = number
-    actions       = list(object({
-      type                = string
-      target_group_arn    = optional(string)
+    actions = list(object({
+      type             = string
+      target_group_arn = optional(string)
       authenticate_cognito = optional(object({
         user_pool_arn       = string
         user_pool_client_id = string
         user_pool_domain    = string
       }))
     }))
-    conditions    = list(object({
+    conditions = list(object({
       field  = string
       values = list(string)
     }))
@@ -115,7 +115,7 @@ variable "egress_rules" {
 variable "certificate_arn" {
   description = " SSL/TLS certificate arn"
   type        = string
-  default = null
+  default     = null
 }
 
 ########################

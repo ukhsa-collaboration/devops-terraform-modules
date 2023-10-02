@@ -31,5 +31,5 @@ output "cognito_user_pool_client_callback_urls" {
 
 output "cognito_domain" {
   description = "The domain associated with the Cognito User Pool."
-  value = aws_cognito_user_pool_domain.domain.domain
+  value       = aws_cognito_user_pool_domain.domain.domain
 }

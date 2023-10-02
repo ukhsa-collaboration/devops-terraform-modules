@@ -4,7 +4,7 @@
 module "resource_name_prefix" {
   source = "../resource-name-prefix"
 
-  name                 = var.name
+  name = var.name
   tags = var.tags
 }
 
@@ -68,7 +68,7 @@ resource "aws_lb_listener" "listener" {
 resource "aws_lb_listener_rule" "listener_rule" {
   count = length(var.listener_rules)
 
-  listener_arn = {for l in aws_lb_listener.listener : "${l.port}-${l.protocol}" => l.arn}["${var.listener_rules[count.index].listener_port}-${var.listener_rules[count.index].protocol}"]
+  listener_arn = { for l in aws_lb_listener.listener : "${l.port}-${l.protocol}" => l.arn }["${var.listener_rules[count.index].listener_port}-${var.listener_rules[count.index].protocol}"]
 
   priority = var.listener_rules[count.index].priority
 

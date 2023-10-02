@@ -83,24 +83,24 @@ module "load_balancer" {
 
   listeners = [
     {
-      port    = 80
+      port     = 80
       protocol = "HTTP"
       actions = [
         {
-          type             = "redirect"
-          redirect_port    = "443"
+          type              = "redirect"
+          redirect_port     = "443"
           redirect_protocol = "HTTPS"
-          status_code        = "HTTP_301"
+          status_code       = "HTTP_301"
         }
       ]
     },
     {
-      port    = 443
+      port     = 443
       protocol = "HTTPS"
       actions = [
         {
           type             = "forward"
-          target_group_arn = module.load_balancer.target_group_arns[0]  # Use the first target group for HTTPS
+          target_group_arn = module.load_balancer.target_group_arns[0] # Use the first target group for HTTPS
         }
       ]
     }
@@ -110,7 +110,7 @@ module "load_balancer" {
     {
       listener_port = 443
       priority      = 1
-      protocol = "HTTPS"
+      protocol      = "HTTPS"
       actions = [
         {
           type = "authenticate-cognito"
@@ -122,7 +122,7 @@ module "load_balancer" {
         },
         {
           type             = "forward"
-          target_group_arn = module.load_balancer.target_group_arns[0]  # Use the first target group for HTTPS
+          target_group_arn = module.load_balancer.target_group_arns[0] # Use the first target group for HTTPS
         }
       ]
       conditions = [
@@ -136,10 +136,10 @@ module "load_balancer" {
 
   ingress_rules = [
     {
-      from_port       = 443
-      to_port         = 443
-      protocol        = "tcp"
-      cidr_blocks     = ["0.0.0.0/0"]
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
       # security_groups = [var.default_sg]
     },
     {
@@ -165,9 +165,9 @@ module "load_balancer" {
 module "domain_routing" {
   source = "../../terraform-modules/domain-routing"
 
-  name                  = var.name
-  vpc_id                = var.vpc_id
-  
+  name   = var.name
+  vpc_id = var.vpc_id
+
   # Route table configuration
   subnet_ids            = module.subnets.subnet_ids
   associate_route_table = true
@@ -179,10 +179,10 @@ module "domain_routing" {
   ]
 
   # Route 53 configuration
-  primary_domain    = var.primary_domain
-  subdomain_prefix = var.subdomain_prefix
+  primary_domain         = var.primary_domain
+  subdomain_prefix       = var.subdomain_prefix
   load_balancer_dns_name = module.load_balancer.load_balancer_dns_name
-  load_balancer_zone_id = module.load_balancer.load_balancer_zone_id
+  load_balancer_zone_id  = module.load_balancer.load_balancer_zone_id
 
   tags = module.tags.tags
 }
@@ -190,13 +190,13 @@ module "domain_routing" {
 module "cognito" {
   source = "../../terraform-modules/cognito"
 
-  name                  = var.name
-  lambda_auth_challenge_arn  = "arn:aws:lambda:eu-west-2:975276445027:function:streamlit-poc-cognito-pre-signup"
-  password_min_length        = 12
+  name                        = var.name
+  lambda_auth_challenge_arn   = "arn:aws:lambda:eu-west-2:975276445027:function:streamlit-poc-cognito-pre-signup"
+  password_min_length         = 12
   temp_password_validity_days = 7
-  token_validity             = 1
-  callback_url               = "https://iac-streamlit-poc.qap-ukhsa.uk/oauth2/idpresponse"
-  domain = var.subdomain_prefix
+  token_validity              = 1
+  callback_url                = "https://iac-streamlit-poc.qap-ukhsa.uk/oauth2/idpresponse"
+  domain                      = var.subdomain_prefix
 
   schema = [
     {
@@ -207,7 +207,7 @@ module "cognito" {
       required                 = true
     }
   ]
-  
+
   recovery_mechanism = [
     {
       name     = "verified_email"

@@ -4,7 +4,7 @@
 module "resource_name_prefix" {
   source = "../resource-name-prefix"
 
-  name                 = var.name
+  name = var.name
   tags = var.tags
 }
 

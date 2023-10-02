@@ -4,7 +4,7 @@
 module "resource_name_prefix" {
   source = "../resource-name-prefix"
 
-  name                 = var.name
+  name = var.name
   tags = var.tags
 }
 
@@ -36,8 +36,8 @@ resource "aws_route_table" "route_table" {
   dynamic "route" {
     for_each = var.routes
     content {
-      cidr_block = route.value.cidr_block
-      gateway_id = lookup(route.value, "gateway_id", null)
+      cidr_block     = route.value.cidr_block
+      gateway_id     = lookup(route.value, "gateway_id", null)
       nat_gateway_id = lookup(route.value, "nat_gateway_id", null)
     }
   }
@@ -62,7 +62,7 @@ resource "aws_acm_certificate" "cert" {
   validation_method = "DNS"
 
   tags = merge(var.tags, { "Name" = "${module.resource_name_prefix.resource_name}-certificate" })
-  
+
   lifecycle {
     create_before_destroy = true
   }

@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=subnet/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=subnet/vALPHA_0.0.0"
 
   name               = var.name
   vpc_id             = var.vpc_id
@@ -21,8 +21,8 @@ module "subnets" {
 }
 
 
-module "ec2_autoscale" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.1"
+module "ec2_instance" {
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.0"
 
   name                 = var.name
   ami                  = var.ec2_ami
@@ -63,7 +63,7 @@ module "ec2_autoscale" {
 }
 
 module "load_balancer" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.0"
 
   name   = var.name
 
@@ -165,7 +165,7 @@ module "load_balancer" {
   tags = module.tags.tags
 }
 module "domain_routing" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.0"
 
   name   = var.name
   vpc_id = var.vpc_id
@@ -190,14 +190,14 @@ module "domain_routing" {
 }
 
 module "cognito" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.0"
 
   name                        = var.name
-  lambda_auth_challenge_arn   = "arn:aws:lambda:eu-west-2:975276445027:function:streamlit-poc-cognito-pre-signup"
+  lambda_auth_challenge_arn   = var.lambda_cognito_pre_signup_arn
   password_min_length         = 12
   temp_password_validity_days = 7
   token_validity              = 1
-  callback_url                = "https://iac-streamlit-poc.qap-ukhsa.uk/oauth2/idpresponse"
+  callback_url                = var.cognito_callback_url
   domain                      = var.subdomain_prefix
 
   schema = [

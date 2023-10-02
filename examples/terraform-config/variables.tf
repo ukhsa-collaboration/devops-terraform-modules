@@ -72,3 +72,13 @@ variable "primary_domain" {
   description = "The name of the Route 53 hosted zone (domain name)."
   type        = string
 }
+
+variable "lambda_cognito_pre_signup_arn" {
+  description = "The ARN of the Lambda function for Cognito pre-signup."
+  type        = string
+}
+
+variable "cognito_callback_url" {
+  description = "The callback URL for Cognito."
+  type        = string
+}

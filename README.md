@@ -30,7 +30,9 @@ All modules are located in the [terraform-modules](./terraform-modules) folder.
 
 ## Versioning
 
-Modules in this repository are versioned using git tags in the format `TF_x.x.x`. For a list of all versions, check the tags in this repository.
+Modules in this repository are versioned using git tags in the format `<module_name>/v<sem_version>`. 
+Pre-release Tags should be formatted in the format `v<release_stage>_<sem_version>`.
+For a list of all versions, check the tags in this repository.
 
 ### Best Practices for Versioning Terraform Modules:
 

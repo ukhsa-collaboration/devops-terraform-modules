@@ -7,7 +7,7 @@ variable "name" {
 }
 
 ########################
-#    Network Config     #
+#    Network Config    #
 ########################
 variable "subnets" {
   description = "List of subnets"
@@ -38,7 +38,7 @@ variable "target_groups" {
 }
 
 ########################
-#   Listener Config    #
+#      Listener        #
 ########################
 variable "listeners" {
   description = "The list of listeners for the load balancer"
@@ -51,6 +51,32 @@ variable "listeners" {
       redirect_port      = optional(string)
       redirect_protocol  = optional(string)
       status_code        = optional(string)
+    }))
+  }))
+  default = []
+}
+
+########################
+#     Listener Rules   #
+########################
+variable "listener_rules" {
+  description = "The list of listener rules for the load balancer"
+  type = list(object({
+    listener_port = number
+    protocol      = string
+    priority      = number
+    actions       = list(object({
+      type                = string
+      target_group_arn    = optional(string)
+      authenticate_cognito = optional(object({
+        user_pool_arn       = string
+        user_pool_client_id = string
+        user_pool_domain    = string
+      }))
+    }))
+    conditions    = list(object({
+      field  = string
+      values = list(string)
     }))
   }))
   default = []

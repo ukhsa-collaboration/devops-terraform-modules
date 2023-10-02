@@ -4,7 +4,7 @@ This Terraform module provides functionalities to manage AWS Cognito User Pools,
 
 ## Prerequisites
 
-- **Resource Naming Prefix Module:** Before using the `aws_cognito` module, you must integrate the [Resource Naming Prefix Module](../resource-name-prefix) to ensure consistent naming across AWS resources. Refer to its documentation to understand its setup and usage.
+- **Terraform Tags Module:** Before using the `ec2-autoscale` module, you must integrate the [Terraform Tags Module](../tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
 
 ## Features
 

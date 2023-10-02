@@ -106,6 +106,34 @@ module "load_balancer" {
     }
   ]
 
+  listener_rules = [
+    {
+      listener_port = 443
+      priority      = 1
+      protocol = "HTTPS"
+      actions = [
+        {
+          type = "authenticate-cognito"
+          authenticate_cognito = {
+            user_pool_arn       = module.cognito.cognito_user_pool_arn
+            user_pool_client_id = module.cognito.cognito_user_pool_client_id
+            user_pool_domain    = module.cognito.cognito_domain
+          }
+        },
+        {
+          type             = "forward"
+          target_group_arn = module.load_balancer.target_group_arns[0]  # Use the first target group for HTTPS
+        }
+      ]
+      conditions = [
+        {
+          field  = "path-pattern"
+          values = ["/"]
+        }
+      ]
+    }
+  ]
+
   ingress_rules = [
     {
       from_port       = 443
@@ -134,7 +162,6 @@ module "load_balancer" {
 
   tags = module.tags.tags
 }
-
 module "domain_routing" {
   source = "../../terraform-modules/domain-routing"
 
@@ -160,7 +187,7 @@ module "domain_routing" {
   tags = module.tags.tags
 }
 
-module "cognito_test" {
+module "cognito" {
   source = "../../terraform-modules/cognito"
 
   name                  = var.name

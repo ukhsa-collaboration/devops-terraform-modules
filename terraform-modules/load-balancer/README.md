@@ -18,7 +18,8 @@ This Terraform module provides functionalities to manage an AWS Application Load
 
 ```hcl
 module "tags" {
-  source          = <PLACEHOLDER_FOR_TAGS_MODULE>
+  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+
   project         = "MyProject"
   client          = "ClientName"
   owner           = "OwnerName"
@@ -29,7 +30,7 @@ module "tags" {
 }
 
 module "aws_alb" {
-  source       = <PLACEHOLDER_should_be_github.com/>
+  source       = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.0"
   name         = "MyLoadBalancer"
   subnets      = ["subnet-0123456a", "subnet-0123456b"]
   vpc_id       = "vpc-01234567"
@@ -40,7 +41,7 @@ module "aws_alb" {
   tags         = module.tags.tags
 }
 
-# Referencing outputs
+# Referencing outputs from the module
 output "alb_arn" {
   value = module.aws_alb.load_balancer_arn
 }

@@ -18,7 +18,8 @@ This Terraform module provides functionalities to manage AWS EC2 AutoScaling Gro
 
 ```hcl
 module "tags" {
-  source          = <PLACEHOLDER_FOR_TAGS_MODULE>
+  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+
   project         = "MyProject"
   client          = "ClientName"
   owner           = "OwnerName"
@@ -29,7 +30,8 @@ module "tags" {
 }
 
 module "ec2_autoscale" {
-  source                = <PLACEHOLDER_should_be_github.com/>
+  source                = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.0"
+
   name                  = "MyProjectName"
   ami                   = "ami-0123456789abcdef0"
   instance_type         = "t2.micro"

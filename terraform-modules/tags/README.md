@@ -12,7 +12,8 @@ This Terraform module provides a standardized set of tags that can be used acros
 
 ```hcl
 module "tags" {
-  source          = <PLACEHOLDER_should_be_gitihub.com/>
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+
   project         = "MyProject"
   client          = "ClientName"
   owner           = "OwnerName"
@@ -22,7 +23,7 @@ module "tags" {
   }
 }
 
-# Example usage
+# Example usage of tags module
 resource "aws_s3_bucket" "example_bucket" {
   bucket = "my-tf-test-bucket"
   acl    = "private"

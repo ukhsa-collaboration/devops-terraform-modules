@@ -1,5 +1,6 @@
 module "tags" {
-  source      = "../../terraform-modules/tags"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+
   project     = var.project
   client      = var.client
   owner       = var.owner
@@ -10,7 +11,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "../../terraform-modules/subnet"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=subnet/vALPHA_0.0.0"
 
   name               = var.name
   vpc_id             = var.vpc_id
@@ -21,7 +22,7 @@ module "subnets" {
 
 
 module "ec2_instance" {
-  source = "../../terraform-modules/ec2-autoscale"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.0"
 
   name                 = var.name
   ami                  = var.ec2_ami
@@ -62,7 +63,8 @@ module "ec2_instance" {
 }
 
 module "load_balancer" {
-  source = "../../terraform-modules/load-balancer"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.0"
+
   name   = var.name
 
   certificate_arn = module.domain_routing.acm_certificate_arn
@@ -163,7 +165,7 @@ module "load_balancer" {
   tags = module.tags.tags
 }
 module "domain_routing" {
-  source = "../../terraform-modules/domain-routing"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.0"
 
   name   = var.name
   vpc_id = var.vpc_id
@@ -188,7 +190,7 @@ module "domain_routing" {
 }
 
 module "cognito" {
-  source = "../../terraform-modules/cognito"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.0"
 
   name                        = var.name
   lambda_auth_challenge_arn   = "arn:aws:lambda:eu-west-2:975276445027:function:streamlit-poc-cognito-pre-signup"

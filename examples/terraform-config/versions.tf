@@ -6,11 +6,11 @@ terraform {
     }
   }
 
-  # backend "s3" {
-  #   bucket = "apps-tf-backend-s3"
-  #   key    = "apps-tf-backend-key"
-  #   region = "eu-west-2"
-  # }
+  backend "s3" {
+    bucket = "apps-tf-backend-s3"
+    key    = "apps-tf-backend-key"
+    region = "eu-west-2"
+  }
 
   required_version = ">=1.2.0"
 

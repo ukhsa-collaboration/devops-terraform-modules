@@ -4,7 +4,7 @@ name: Self-Service-IAC
 on:
   workflow_dispatch:
     branches:
-      - feature/gh-actions-trigger
+      - main
     inputs:
       awsregion:
         type: string
@@ -66,7 +66,7 @@ jobs:
       - name: Checkout Repo2
         uses: actions/checkout@v3
         with:
-          ref: feature/gh-actions-trigger
+          ref: main
 
       - name: Setup SSH Key
         run: |
@@ -80,14 +80,17 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
       - name: Terraform Init
+        working-directory: examples/terraform-config
         id: init
         run: terraform init
      
       - name: Terraform Validate
+        working-directory: examples/terraform-config
         id: validate
         run: terraform validate 
 
       - name: Terraform Plan
+        working-directory: examples/terraform-config
         id: plan
         run: terraform plan -var-file="test.tfvars" 
 

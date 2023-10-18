@@ -1,39 +1,71 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+# Sample workflow to access AWS resources when workflow is tied to branch
+# The workflow Creates static website using aws s3    #
+name: Self-Service-IAC
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    branches:
+      - feature/gh-actions-trigger
+    inputs:
+      awsregion:
+        type: string
+        required: true
+        description: 'aws region to deploy to'
+        default: 'eu-west-2'
+      role:
+        type: string
+        required: true
+        description: 'aws role to assume'
+        default: 'role'
+      vars:
+        type: string
+        required: true
+        description: 'variables for .tfvars file'
+        default: 'project_name = "self-service-iac"\nbackend_bucket_name = "self-service-iac-backend2"\nbackend_bucket_key = "self-service-iac-backend-key2"\naws_region = "eu-west-2"\necr_name = "self-service-ecr2"'
+     
+env:
+  AWS_REGION: "eu-west-2"
+permissions:
+  id-token: write # This is required for requesting the JWT # This is required for actions/checkout
+  contents: write
+defaults:
+  run:
+    working-directory: terraform
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  tf_fmt:
+    name: Deploy Site
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ github.event.inputs.role }}
+          role-session-name: testsession
+          aws-region: ${{ github.event.inputs.awsregion }}
+      
+      - name: Create .tfvars File
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo -e '${{ github.event.inputs.vars }}' > test.tfvars
+
+      - name: Login to Github  
+        run: |
+          git config --global user.email "alistair.masawi@ukhsa.gov.uk"
+          git config --global user.name "alistair001"
+          git add test.tfvars
+          git commit -m "Add test.tfvars file"
+          git push
+          git pull
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Checkout Repo2
+        uses: actions/checkout@v3
+        with:
+          ref: feature/gh-actions-trigger
 
       - name: Setup SSH Key
         run: |
@@ -45,3 +77,17 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+     
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate 
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -var-file="test.tfvars" 
+
+

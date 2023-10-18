@@ -5,8 +5,7 @@ terraform {
       version = "~>4.16"
     }
   }
-
-  backend "s3" {
+backend "s3" {
     bucket = "apps-tf-backend-s3"
     key    = "apps-tf-backend-key"
     region = "eu-west-2"

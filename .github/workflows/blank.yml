@@ -27,9 +27,9 @@ env:
 permissions:
   id-token: write # This is required for requesting the JWT # This is required for actions/checkout
   contents: write
-defaults:
-  run:
-    working-directory: examples/terraform-config
+#defaults:
+#  run:
+#    working-directory: examples/terraform-config
 
 jobs:
   tf_fmt:
@@ -48,8 +48,7 @@ jobs:
       
       - name: Create .tfvars File
         run: |
-          ls
-          echo -e '${{ github.event.inputs.vars }}' > test.tfvars
+          echo -e '${{ github.event.inputs.vars }}' > ./examples/terraform-config/test.tfvars
 
       - name: Login to Github  
         run: |

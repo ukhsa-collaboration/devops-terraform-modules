@@ -29,7 +29,7 @@ permissions:
   contents: write
 defaults:
   run:
-    working-directory: examples\terraform-config
+    working-directory: examples/terraform-config
 
 jobs:
   tf_fmt:

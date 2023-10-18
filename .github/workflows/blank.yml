@@ -50,7 +50,8 @@ jobs:
         run: |
           echo -e '${{ github.event.inputs.vars }}' > ./examples/terraform-config/test.tfvars
 
-      - name: Login to Github  
+      - name: Login to Github
+        working-directory: examples/terraform-config  
         run: |
           git config --global user.email "alistair.masawi@ukhsa.gov.uk"
           git config --global user.name "alistair001"

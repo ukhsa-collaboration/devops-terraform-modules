@@ -29,7 +29,7 @@ permissions:
   contents: write
 defaults:
   run:
-    working-directory: ./examples/terraform-config/
+    working-directory: examples/terraform-config
 
 jobs:
   tf_fmt:
@@ -48,6 +48,7 @@ jobs:
       
       - name: Create .tfvars File
         run: |
+          ls
           echo -e '${{ github.event.inputs.vars }}' > test.tfvars
 
       - name: Login to Github  

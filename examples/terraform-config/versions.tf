@@ -6,8 +6,8 @@ terraform {
     }
   }
 backend "s3" {
-    bucket = "apps-tf-backend-s3"
-    key    = "apps-tf-backend-key"
+    bucket = "apps-tf-backend-s3-trre6"
+    key    = "apps-tf-backend-s3-trre6"
     region = "eu-west-2"
   }
 

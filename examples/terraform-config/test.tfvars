@@ -1,8 +1,3 @@
-project_name = "self-service-iac"
-backend_bucket_name = "self-service-iac-backend3"
-backend_bucket_key = "self-service-iac-backend-key2"
-aws_region = "eu-west-2"
-ecr_name = "self-service-ecr-12"
 vpc_id = "vpc-0bf89204327670055"
 subnet_1_cidr_block = "10.0.224.0/27"
 subnet_2_cidr_block = "10.0.224.32/27"

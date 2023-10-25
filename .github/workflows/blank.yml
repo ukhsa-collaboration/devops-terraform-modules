@@ -92,6 +92,8 @@ jobs:
       - name: Terraform Plan
         working-directory: examples/terraform-config
         id: plan
-        run: terraform plan -var-file="test.tfvars" 
+        run: |
+          export TF_LOG="DEBUG"
+          terraform plan -var-file="test.tfvars" 
 
 

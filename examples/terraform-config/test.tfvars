@@ -7,4 +7,5 @@ client = "my-client"
 owner = "UKHSA"
 environment = "dev"
 name = "iac-poc"
+aws_region = "eu-west-2"
 

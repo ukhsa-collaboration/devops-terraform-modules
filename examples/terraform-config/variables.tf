@@ -22,11 +22,11 @@ variable "environment" {
   description = "The environment for this deployment (e.g., dev, prod)"
   type        = string
 }
-/**
+
 variable "aws_region" {
   description = "Region in which AWS Resources to be created"
   type        = string
-}**/
+}
 
 variable "vpc_id" {
   description = "ID of the VPC"

@@ -14,9 +14,7 @@ module "waf" {
   source = "../../../terraform-modules/azure/web-application-firewall"
 
   name = var.name
-  # waf_description = "API Gateway WAF"
-
-  
+  resource_group = "rg-apimpoc"
 
   tags = module.tags.tags
 }

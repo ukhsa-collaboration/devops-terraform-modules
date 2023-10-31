@@ -1,5 +1,5 @@
 module "tags" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
 
   project     = var.project
   client      = var.client
@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/subnet?ref=TF/aws/subnet/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/subnet?ref=TF/aws/subnet/vALPHA_0.0.1"
 
   name               = var.name
   vpc_id             = var.vpc_id

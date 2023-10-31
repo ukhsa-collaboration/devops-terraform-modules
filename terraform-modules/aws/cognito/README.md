@@ -17,7 +17,7 @@ This Terraform module provides functionalities to manage AWS Cognito User Pools,
 
 ```hcl
 module "tags" {
-  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
+  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
 
   project         = "MyProject"
   client          = "ClientName"
@@ -29,7 +29,7 @@ module "tags" {
 }
 
 module "aws_cognito" {
-  source                      = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.0"
+  source                      = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.1"
 
   name                        = var.name
   lambda_auth_challenge_arn   = var.lambda_auth_challenge_arn

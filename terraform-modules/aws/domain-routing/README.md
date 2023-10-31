@@ -18,7 +18,7 @@ This Terraform module provides functionalities to manage AWS resources related t
 
 ```hcl
 module "tags" {
-  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
+  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
 
   project         = "MyProject"
   client          = "ClientName"
@@ -30,7 +30,7 @@ module "tags" {
 }
 
 module "domain_routing" {
-  source                  = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.0"
+  source                  = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.1"
   
   name                    = "MyResource"
   vpc_id                  = "vpc-01234567"

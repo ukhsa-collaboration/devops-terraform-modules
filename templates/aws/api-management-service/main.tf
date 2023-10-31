@@ -1,5 +1,5 @@
 module "tags" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
 
   project     = var.project
   client      = var.client
@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "api_gateway" {
-    source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.0"
+    source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.1"
 
     name = var.name
 
@@ -50,7 +50,7 @@ module "api_gateway" {
 }
 
 module "waf" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/web-application-firewall?ref=TF/aws/web-application-firewall/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/web-application-firewall?ref=TF/aws/web-application-firewall/vALPHA_0.0.1"
 
   name = var.name
   waf_description = "API Gateway WAF"
@@ -71,7 +71,7 @@ module "waf" {
 }
 
 module "cloudfront_distribution" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.1"
 
   # Naming Config
   name = var.name

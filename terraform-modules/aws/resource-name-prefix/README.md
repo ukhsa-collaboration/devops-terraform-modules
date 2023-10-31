@@ -4,7 +4,7 @@ This Terraform module provides functionalities to manage the naming configuratio
 
 ## Prerequisites
 
-- **Terraform Tags Module**: Before using the `load-balancer` module, you must integrate the [Terraform Tags Module](../tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
+- **Terraform Tags Module**: Before using the `load-balancer` module, you must integrate the [Terraform Tags Module](../helpers/tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
 
 ## Features
 

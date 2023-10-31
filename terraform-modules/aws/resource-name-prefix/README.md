@@ -16,7 +16,7 @@ This Terraform module provides functionalities to manage the naming configuratio
 
 ```hcl
 module "resource_name_prefix" {
-  source  = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=resource-name-prefix/vALPHA_0.0.0"
+  source  = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=TF/helpers/resource-name-prefix/vALPHA_0.0.0"
   name    = "MyResource"
   tags    = module.tags.tags
 }

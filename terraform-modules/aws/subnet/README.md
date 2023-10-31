@@ -16,7 +16,7 @@ This Terraform module manages the creation of AWS Subnets. It's designed to offe
 
 ```hcl
 module "tags" {
-  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
 
   project         = "MyProject"
   client          = "ClientName"

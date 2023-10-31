@@ -12,7 +12,7 @@ This Terraform module provides a standardized set of tags that can be used acros
 
 ```hcl
 module "tags" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
 
   project         = "MyProject"
   client          = "ClientName"

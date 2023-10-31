@@ -14,15 +14,28 @@ Welcome to the Terraform Modules Repository. This repository contains a collecti
     - [Terraform CDK in Python](#terraform-cdk-in-python)
   - [Documentation Assets](#documentation-assets)
 
+
+## Templates
+- WIP - To be Updated Soon!
+
 ## Modules
 
 The following Terraform modules are available:
-
-1. [Subnet](./terraform-modules/subnet)
-2. [AWS Application Load Balancer (ALB)](./terraform-modules/load-balancer)
-3. [EC2 AutoScale](./terraform-modules/ec2-autoscale)
-4. [Domain Routing](./terraform-modules/domain-routing)
-5. [Resource Name Prefix](./terraform-modules/resource-name-prefix)
+- Helpers:
+    1. [Resource Name Prefix](./terraform-modules/helpers/resource-name-prefix)
+    2. [Tags](./terraform-modules/helpers/tags)
+- AWS:
+    1. [API Gateway](./terraform-modules/aws/api-gateway)
+    2. [CloudFront Distribution](./terraform-modules/aws/cloudfront-distribution)
+    3. [Cognito](./terraform-modules/aws/cognito)
+    4. [Domain Routing](./terraform-modules/aws/domain-routing)
+    5. [EC2 AutoScale](./terraform-modules/aws/ec2-autoscale)
+    6. [Load Balancer](./terraform-modules/aws/load-balancer)
+    7. [Resource Name Prefix](./terraform-modules/aws/resource-name-prefix)
+    8. [Subnet](./terraform-modules/aws/subnet)
+    9. [Web Application Firewall](./terraform-modules/aws/web-application-firewall)
+- Azure:
+    1. [Web Application Firewall](./terraform-modules/azure/web-application-firewall)
 
 All modules are located in the [terraform-modules](./terraform-modules) folder.
 
@@ -42,14 +55,6 @@ For a list of all versions, check the tags in this repository.
 3. **Pin Versions:** In configurations, specify module versions for consistency.
 4. **Limit Major Changes:** Introduce backward-incompatible changes sparingly.
 5. **Testing:** Test modules thoroughly before releasing, especially for major updates.
-
-### Terraform Manifests
-
-To see examples of how to use these modules with standard Terraform configurations, navigate to the [terraform-config](./examples/terraform-config) folder.
-
-### Terraform CDK in Python
-
-For those interested in using the Terraform Cloud Development Kit (CDK) in Python, examples are provided in the [CDK-terraform-config](./examples/CDK-terraform-config) folder.
 
 ## Documentation Assets
 

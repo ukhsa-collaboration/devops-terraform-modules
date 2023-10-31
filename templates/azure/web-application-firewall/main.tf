@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "waf" {
-  source = "../../../terraform-modules/azure/web-application-firewall"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/azure/web-application-firewall?ref=TF/azure/web-application-firewall/vALPHA_0.0.0"
 
   name = var.name
   resource_group = "rg-apimpoc"

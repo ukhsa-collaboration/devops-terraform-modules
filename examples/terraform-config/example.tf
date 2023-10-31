@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=subnet/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/subnet?ref=TF/aws/subnet/vALPHA_0.0.0"
 
   name               = var.name
   vpc_id             = var.vpc_id

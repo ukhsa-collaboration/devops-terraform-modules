@@ -22,7 +22,7 @@ The following Terraform modules are available:
 2. [AWS Application Load Balancer (ALB)](./terraform-modules/load-balancer)
 3. [EC2 AutoScale](./terraform-modules/ec2-autoscale)
 4. [Domain Routing](./terraform-modules/domain-routing)
-5. [Resource Name Prefix](./terraform-modules/resource-nam-prefix)
+5. [Resource Name Prefix](./terraform-modules/resource-name-prefix)
 
 All modules are located in the [terraform-modules](./terraform-modules) folder.
 
@@ -30,9 +30,8 @@ All modules are located in the [terraform-modules](./terraform-modules) folder.
 
 ## Versioning
 
-Modules in this repository are versioned using git tags in the format `<module_name>/v<sem_version>`. 
-
-Pre-release Tags should be formatted in the format `v<release_stage>_<sem_version>`.
+- Modules in this repository are versioned using git tags in the format `<IaC_tool>/<cloud_provider>/<module_name>/v<sem_version>`. 
+- Pre-release Tags should be formatted in the format `<IaC_tool>/<cloud_provider>/<module_name>/v<release_stage>_<sem_version>`.
 
 For a list of all versions, check the tags in this repository.
 

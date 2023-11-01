@@ -23,15 +23,15 @@ variable "endpoints" {
 }
 
 ############################
-#    Lambda Integration    #
+#       Integration        #
 ############################
-variable "lambda_function_name" {
-  description = "The name of the Lambda function."
+variable "integration_uri" {
+  description = "The integration URI of your resource."
   type        = string
 }
 
-variable "lambda_function_invoke_arn" {
-  description = "The ARN of the Lambda function."
+variable "integration_type" {
+  description = "The integration type of your resource."
   type        = string
 }
 
@@ -91,6 +91,20 @@ variable "throttle_settings" {
     burst_limit = 200
     rate_limit  = 100
   }
+}
+
+##########################
+#       VPC Links        #
+##########################
+variable "create_vpc_link" {
+  description = "Whether to create a VPC Link for the API Gateway integration"
+  default     = false
+}
+
+variable "vpc_link_target_arns" {
+  description = "List of ARNs to be used by the VPC Link"
+  default     = []
+  type        = list(string)
 }
 
 ########################

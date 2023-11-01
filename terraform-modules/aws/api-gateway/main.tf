@@ -48,8 +48,8 @@ resource "aws_api_gateway_method" "api_method" {
 }
 
 ############################
-#    Lambda Integration    #
-############################ # Most likely this should be its own module
+#        Integration       #
+############################
 resource "aws_api_gateway_integration" "lambda_integration" {
   for_each = { for idx, endpoint in local.expanded_endpoints : "${endpoint.key}-${endpoint.method}" => endpoint }
 
@@ -58,39 +58,11 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   resource_id             = aws_api_gateway_resource.api_resource[each.value.key].id
   http_method             = each.value.method
   integration_http_method = each.value.method
-  type                    = "AWS_PROXY"
-  uri                     = var.lambda_function_invoke_arn
-}
+  type                    = var.integration_type
+  uri                     = var.integration_uri
 
-
-resource "aws_lambda_permission" "apigw_lambda_permission" {
-  statement_id   = "${module.resource_name_prefix.resource_name}-allow-api-gw-invoke"
-  action         = "lambda:InvokeFunction"
-  function_name  = var.lambda_function_name
-  principal      = "apigateway.amazonaws.com"
-  source_arn     = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*/*"
-}
-
-resource "aws_iam_policy" "api_gateway_invoke_lambda" {
-  name        = "${module.resource_name_prefix.resource_name}-api-gw-invoke-lambda"
-  description = "Allows API Gateway to invoke Lambda function"
-  policy      = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "lambda:InvokeFunction",
-            "Resource": "${var.lambda_function_invoke_arn}"
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "api_gateway_invoke_lambda_attachment" {
-  role       = aws_iam_role.api_gateway_cloudwatch_role.name
-  policy_arn = aws_iam_policy.api_gateway_invoke_lambda.arn
+  connection_type = var.create_vpc_link ? "VPC_LINK" : "INTERNET"
+  connection_id   = var.create_vpc_link ? aws_api_gateway_vpc_link.vpc_link[0].id : null
 }
 
 ###########################
@@ -140,7 +112,7 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
 #     API Deployment     #
 ##########################
 resource "aws_api_gateway_deployment" "deployment" {
-  depends_on  = [aws_api_gateway_method.api_method, aws_api_gateway_resource.api_resource, aws_api_gateway_integration.lambda_integration, aws_lambda_permission.apigw_lambda_permission]
+  depends_on  = [aws_api_gateway_method.api_method, aws_api_gateway_resource.api_resource, aws_api_gateway_integration.lambda_integration]
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
   lifecycle {
     create_before_destroy = true
@@ -264,4 +236,16 @@ resource "aws_iam_role_policy_attachment" "api_gw_cloudwatch_policy_attachment" 
 resource "aws_api_gateway_account" "api_gateway_account" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch_role.arn
 }
+
+
+##########################
+#       VPC Links        #
+##########################
+resource "aws_api_gateway_vpc_link" "vpc_link" {
+  count             = var.create_vpc_link ? 1 : 0  # Conditional creation
+  name              = "${module.resource_name_prefix.resource_name}-vpc-link"
+  description       = "VPC link for ${module.resource_name_prefix.resource_name} API"
+  target_arns       = var.vpc_link_target_arns
+}
+
 

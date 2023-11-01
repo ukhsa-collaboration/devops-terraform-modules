@@ -11,26 +11,28 @@ module "tags" {
 }
 
 module "api_gateway" {
-    source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.1"
+    source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.2"
 
     name = var.name
 
-    lambda_function_name = aws_lambda_function.lambda.function_name #""
-    lambda_function_invoke_arn = aws_lambda_function.lambda.invoke_arn #""
-
     aws_region = var.aws_region
+
+    # API Gateway
     stage_names = [ "prod", "dev" ]
+    allowed_ip_ranges = {
+        prod = [ "0.0.0.0/0" ] 
+        dev =  ["198.51.100.0/24", "198.51.100.1/24"]
+    }
 
     endpoints = {
       example = {
         path = "example"
         methods = [ "POST", "GET" ] 
+      },
+      example2 = {
+        path = "example2"
+        methods = [ "POST" ]
       }
-    }
-
-    allowed_ip_ranges = {
-        prod = [ "0.0.0.0/0" ] 
-        dev =  ["198.51.100.0/24", "198.51.100.1/24"]
     }
 
     log_retention_in_days = 1
@@ -45,6 +47,14 @@ module "api_gateway" {
         burst_limit = 200
         rate_limit = 100
     }
+
+    # API Gateway Integration
+    integration_uri = aws_lambda_function.lambda.invoke_arn
+    integration_type = "AWS_PROXY"
+
+    # VPC Links
+    create_vpc_link = false
+    vpc_link_target_arns = [ "my-vpc-arn" ]
 
     tags = module.tags.tags
 }

@@ -11,4 +11,4 @@ owner       = "Capacitas"
 environment = "dev"
 
 # ip ranges
-allowed_ip_ranges = [ "0.0.0.0/0" ]
+allowed_ip_ranges = ["0.0.0.0/0"]

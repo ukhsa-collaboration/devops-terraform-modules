@@ -21,16 +21,16 @@ locals {
   expanded_endpoints = flatten([
     for key, endpoint in var.endpoints : [
       for method in endpoint.methods : {
-        key       = key
-        path      = endpoint.path
-        method    = method
+        key    = key
+        path   = endpoint.path
+        method = method
       }
     ]
   ])
 }
 
 resource "aws_api_gateway_resource" "api_resource" {
-  for_each     = var.endpoints
+  for_each = var.endpoints
 
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
   parent_id   = aws_api_gateway_rest_api.api_gw.root_resource_id
@@ -44,7 +44,7 @@ resource "aws_api_gateway_method" "api_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gw.id
   resource_id   = aws_api_gateway_resource.api_resource[each.value.key].id
   http_method   = each.value.method
-  authorization = "NONE"  # Assuming no authorization for simplicity
+  authorization = "NONE" # Assuming no authorization for simplicity
 }
 
 ############################
@@ -69,7 +69,7 @@ resource "aws_api_gateway_integration" "lambda_integration" {
 #      API Usage Plan     #
 ###########################
 resource "aws_api_gateway_usage_plan" "usage_plan" {
-  depends_on = [ aws_api_gateway_stage.stage ]
+  depends_on  = [aws_api_gateway_stage.stage]
   name        = "${module.resource_name_prefix.resource_name}-api-up"
   description = "Usage plan for ${module.resource_name_prefix.resource_name} API"
 
@@ -147,7 +147,7 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
   for_each = toset(var.stage_names)
 
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -242,10 +242,10 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 #       VPC Links        #
 ##########################
 resource "aws_api_gateway_vpc_link" "vpc_link" {
-  count             = var.create_vpc_link ? 1 : 0  # Conditional creation
-  name              = "${module.resource_name_prefix.resource_name}-vpc-link"
-  description       = "VPC link for ${module.resource_name_prefix.resource_name} API"
-  target_arns       = var.vpc_link_target_arns
+  count       = var.create_vpc_link ? 1 : 0 # Conditional creation
+  name        = "${module.resource_name_prefix.resource_name}-vpc-link"
+  description = "VPC link for ${module.resource_name_prefix.resource_name} API"
+  target_arns = var.vpc_link_target_arns
 }
 
 

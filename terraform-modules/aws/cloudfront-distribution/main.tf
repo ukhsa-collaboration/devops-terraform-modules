@@ -28,9 +28,9 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     }
   }
 
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "${module.resource_name_prefix.resource_name} CloudFront Distribution - ${var.description}"
+  enabled         = true
+  is_ipv6_enabled = true
+  comment         = "${module.resource_name_prefix.resource_name} CloudFront Distribution - ${var.description}"
 
   default_cache_behavior {
     allowed_methods  = var.allowed_methods
@@ -59,14 +59,14 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
 
   restrictions {
     geo_restriction {
-      restriction_type  = "whitelist"
-      locations         = var.geo_restriction_locations
+      restriction_type = "whitelist"
+      locations        = var.geo_restriction_locations
     }
   }
 
   logging_config {
     include_cookies = false
-    bucket          = "${aws_s3_bucket.logs.bucket_domain_name}"
+    bucket          = aws_s3_bucket.logs.bucket_domain_name
     prefix          = "cloudfront/logs/"
   }
 

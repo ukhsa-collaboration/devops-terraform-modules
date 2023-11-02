@@ -10,7 +10,7 @@ output "api_url" {
 }
 
 output "api_stage_name" {
-  value = module.api_gateway.api_stage_name
+  value       = module.api_gateway.api_stage_name
   description = "The names of the deployed stages"
 }
 
@@ -27,7 +27,7 @@ output "api_key_id" {
 output "api_key_value" {
   value       = module.api_gateway.api_key_value
   description = "The value of the API key"
-  sensitive = true
+  sensitive   = true
 }
 
 output "usage_plan_id" {
@@ -36,7 +36,7 @@ output "usage_plan_id" {
 }
 
 output "cloudwatch_log_group_name" {
-  value = module.api_gateway.cloudwatch_log_group_name
+  value       = module.api_gateway.cloudwatch_log_group_name
   description = "The names of the CloudWatch Log Groups for each stage."
 }
 

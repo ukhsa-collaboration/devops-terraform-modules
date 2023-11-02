@@ -65,7 +65,7 @@ module "ec2_autoscale" {
 module "load_balancer" {
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.1"
 
-  name   = var.name
+  name = var.name
 
   certificate_arn = module.domain_routing.acm_certificate_arn
 

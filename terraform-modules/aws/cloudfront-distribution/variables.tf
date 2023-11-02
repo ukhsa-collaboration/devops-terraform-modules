@@ -40,7 +40,7 @@ variable "geo_restriction_locations" {
 variable "ttl" {
   description = "TTL settings for the CloudFront Distribution."
   type        = map(number)
-  default     = {
+  default = {
     min_ttl     = 0
     default_ttl = 3600
     max_ttl     = 86400

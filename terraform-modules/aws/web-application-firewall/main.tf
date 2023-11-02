@@ -83,7 +83,7 @@ resource "aws_wafv2_web_acl" "waf" {
 # WAF Association to API #
 ##########################
 resource "aws_wafv2_web_acl_association" "waf_association" {
-  count       = length(var.association_resource_arns)
+  count        = length(var.association_resource_arns)
   resource_arn = var.association_resource_arns[count.index]
   web_acl_arn  = aws_wafv2_web_acl.waf.arn
 }
@@ -92,7 +92,7 @@ resource "aws_wafv2_web_acl_association" "waf_association" {
 #       Logging          #
 ##########################
 resource "aws_cloudwatch_log_group" "log_group" {
-  name               = "aws-waf-logs-${module.resource_name_prefix.resource_name}" # the aws-waf-logs- is necessary for this config to work
+  name              = "aws-waf-logs-${module.resource_name_prefix.resource_name}" # the aws-waf-logs- is necessary for this config to work
   retention_in_days = var.retention_in_days
 }
 
@@ -118,7 +118,7 @@ data "aws_iam_policy_document" "waf_cloudwatch_policy" {
     actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
     resources = ["${aws_cloudwatch_log_group.log_group.arn}:*"]
     condition {
-      test     = "ArnLike"  
+      test     = "ArnLike"
       values   = ["arn:aws:logs:${var.aws_region}:${data.aws_caller_identity.current.account_id}:*"]
       variable = "aws:SourceArn"
     }

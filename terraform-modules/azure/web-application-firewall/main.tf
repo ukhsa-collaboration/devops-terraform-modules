@@ -41,10 +41,10 @@ resource "azurerm_web_application_firewall_policy" "waf_policy" {
   dynamic "custom_rules" {
     for_each = var.custom_rules
     content {
-      name     = custom_rules.value.name
-      priority = custom_rules.value.priority
+      name      = custom_rules.value.name
+      priority  = custom_rules.value.priority
       rule_type = custom_rules.value.rule_type
-      action   = custom_rules.value.action
+      action    = custom_rules.value.action
       match_conditions {
         match_variables {
           variable_name = custom_rules.value.match_variable_name
@@ -83,7 +83,7 @@ resource "azurerm_log_analytics_workspace" "workspace" {
   resource_group_name = data.azurerm_resource_group.rg.name
   location            = data.azurerm_resource_group.rg.location
   sku                 = "PerGB2018"
-  tags = var.tags
+  tags                = var.tags
 }
 
 # resource "azurerm_monitor_diagnostic_setting" "waf_diagnostics" {

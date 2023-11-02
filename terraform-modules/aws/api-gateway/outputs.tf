@@ -14,12 +14,12 @@ output "api_stage_name" {
 }
 
 output "api_stage_invoke_url" {
-  value = { for stage in toset(var.stage_names) : stage => aws_api_gateway_stage.stage[stage].invoke_url }
+  value       = { for stage in toset(var.stage_names) : stage => aws_api_gateway_stage.stage[stage].invoke_url }
   description = "The invoke URL of the deployed stage"
 }
 
 output "stage_arns" {
-  value = values({ for stage_name, stage in aws_api_gateway_stage.stage : stage_name => stage.arn })
+  value       = values({ for stage_name, stage in aws_api_gateway_stage.stage : stage_name => stage.arn })
   description = "The ARNs of the API Gateway stages."
 }
 

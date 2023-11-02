@@ -19,28 +19,28 @@ variable "resource_group" {
 ############################
 variable "managed_rules" {
   description = "A list of additional managed rules to apply."
-  type        = list(object({
+  type = list(object({
     type    = string
     version = string
   }))
-  default     = []
+  default = []
 }
 
 variable "custom_rules" {
   description = "A list of custom rules for the Web Application Firewall Policy."
-  type        = list(object({
-    name                   = string
-    priority               = number
-    rule_type              = string
-    action                 = string
-    match_variable_name    = string
-    match_variable_operator= string
-    match_variable_selector= string
-    condition_operator     = string
-    condition_negation     = bool
-    condition_match_values = list(string)
+  type = list(object({
+    name                    = string
+    priority                = number
+    rule_type               = string
+    action                  = string
+    match_variable_name     = string
+    match_variable_operator = string
+    match_variable_selector = string
+    condition_operator      = string
+    condition_negation      = bool
+    condition_match_values  = list(string)
   }))
-  default     = []
+  default = []
 }
 
 ########################

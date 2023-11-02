@@ -15,7 +15,7 @@ variable "aws_region" {
 }
 
 variable "endpoints" {
-  type        = map(object({
+  type = map(object({
     path    = string
     methods = list(string)
   }))
@@ -68,13 +68,13 @@ variable "log_retention_in_days" {
 #     Other Settings     #
 ##########################
 variable "quota_settings" {
-  type        = object({
+  type = object({
     limit  = number
     offset = number
     period = string
   })
   description = "A map of quota settings for the API Usage Plan"
-  default     = {
+  default = {
     limit  = 5000
     offset = 0
     period = "MONTH"
@@ -82,12 +82,12 @@ variable "quota_settings" {
 }
 
 variable "throttle_settings" {
-  type        = object({
+  type = object({
     burst_limit = number
     rate_limit  = number
   })
   description = "A map of throttle settings for the API Usage Plan"
-  default     = {
+  default = {
     burst_limit = 200
     rate_limit  = 100
   }

@@ -16,11 +16,11 @@ resource "aws_api_gateway_rest_api" "api_gw" {
   description = "REST API Gateway for ${module.resource_name_prefix.resource_name}"
 
   endpoint_configuration {
-    types           = var.create_private_endpoint ? ["PRIVATE"] : ["EDGE", "REGIONAL"]
+    types            = var.create_private_endpoint ? ["PRIVATE"] : ["EDGE", "REGIONAL"]
     vpc_endpoint_ids = var.create_private_endpoint ? var.vpc_endpoint_ids : null
   }
 
-  tags        = var.tags
+  tags = var.tags
 }
 
 locals {
@@ -169,10 +169,10 @@ locals {
     },
     # Only add the Deny statement if use_private_endpoint is true
     var.create_private_endpoint ? {
-      Effect = "Deny",
+      Effect    = "Deny",
       Principal = "*",
-      Action = "execute-api:Invoke",
-      Resource = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*",
+      Action    = "execute-api:Invoke",
+      Resource  = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*",
       Condition = {
         StringNotEquals = {
           "aws:sourceVpce" = var.vpc_endpoint_ids
@@ -188,7 +188,7 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version   = "2012-10-17",
     Statement = local.filtered_policy_statements
   })
 }
@@ -269,8 +269,8 @@ resource "aws_api_gateway_account" "api_gateway_account" {
 #       VPC Links        #
 ##########################
 resource "aws_api_gateway_vpc_link" "vpc_link" {
-  count             = var.create_vpc_link ? 1 : 0  # Conditional creation
-  name              = "${module.resource_name_prefix.resource_name}-vpc-link"
-  description       = "VPC link for ${module.resource_name_prefix.resource_name} API"
-  target_arns       = var.vpc_link_target_arns # 06/11/2023 - Note: Currently AWS only supports 1 target
+  count       = var.create_vpc_link ? 1 : 0 # Conditional creation
+  name        = "${module.resource_name_prefix.resource_name}-vpc-link"
+  description = "VPC link for ${module.resource_name_prefix.resource_name} API"
+  target_arns = var.vpc_link_target_arns # 06/11/2023 - Note: Currently AWS only supports 1 target
 }

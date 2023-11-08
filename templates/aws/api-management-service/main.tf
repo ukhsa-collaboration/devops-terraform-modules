@@ -11,18 +11,15 @@ module "tags" {
 }
 
 module "api_gateway" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.2"
+    source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.2"
 
   name = var.name
 
   aws_region = var.aws_region
 
   # API Gateway
-  stage_names = ["prod", "dev"]
-  allowed_ip_ranges = {
-    prod = ["0.0.0.0/0"]
-    dev  = ["198.51.100.0/24", "198.51.100.1/24"]
-  }
+  stage_names = [ "prod", "dev" ]
+  allowed_ip_ranges = [ "0.0.0.0/0" ] 
 
   endpoints = {
     example = {
@@ -55,6 +52,10 @@ module "api_gateway" {
   # VPC Links
   create_vpc_link      = false
   vpc_link_target_arns = ["my-vpc-arn"]
+
+  # Private Endpoints
+  create_private_endpoint = false
+  vpc_endpoint_ids     = ["my_vpc_id"]
 
   tags = module.tags.tags
 }

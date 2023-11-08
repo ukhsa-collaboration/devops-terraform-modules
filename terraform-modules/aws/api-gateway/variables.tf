@@ -52,7 +52,7 @@ variable "stage_names" {
 #    Specify IP Ranges   #
 ##########################
 variable "allowed_ip_ranges" {
-  type        = map(list(string))
+  type        = list(string)
   description = "A map of allowed IP ranges for each stage."
 }
 
@@ -105,6 +105,21 @@ variable "vpc_link_target_arns" {
   description = "List of ARNs to be used by the VPC Link"
   default     = []
   type        = list(string)
+}
+
+##########################
+#   Private Endpoints    #
+##########################
+variable "create_private_endpoint" {
+  description = "Whether to create a private endpoint for the API Gateway"
+  type        = bool
+  default     = false
+}
+
+variable "vpc_endpoint_ids" {
+  description = "List of VPC Endpoint IDs to associate with the API Gateway if a private endpoint is used"
+  type        = list(string)
+  default     = []
 }
 
 ########################

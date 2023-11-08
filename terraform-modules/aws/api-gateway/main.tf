@@ -14,6 +14,12 @@ module "resource_name_prefix" {
 resource "aws_api_gateway_rest_api" "api_gw" {
   name        = "${module.resource_name_prefix.resource_name}-api-gw"
   description = "REST API Gateway for ${module.resource_name_prefix.resource_name}"
+
+  endpoint_configuration {
+    types           = var.create_private_endpoint ? ["PRIVATE"] : ["EDGE", "REGIONAL"]
+    vpc_endpoint_ids = var.create_private_endpoint ? var.vpc_endpoint_ids : null
+  }
+
   tags        = var.tags
 }
 
@@ -37,7 +43,6 @@ resource "aws_api_gateway_resource" "api_resource" {
   path_part   = each.value.path
 }
 
-
 resource "aws_api_gateway_method" "api_method" {
   for_each = { for idx, endpoint in local.expanded_endpoints : "${endpoint.key}-${endpoint.method}" => endpoint }
 
@@ -50,7 +55,7 @@ resource "aws_api_gateway_method" "api_method" {
 ############################
 #        Integration       #
 ############################
-resource "aws_api_gateway_integration" "lambda_integration" {
+resource "aws_api_gateway_integration" "integration" {
   for_each = { for idx, endpoint in local.expanded_endpoints : "${endpoint.key}-${endpoint.method}" => endpoint }
 
   depends_on              = [aws_api_gateway_method.api_method]
@@ -112,8 +117,14 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
 #     API Deployment     #
 ##########################
 resource "aws_api_gateway_deployment" "deployment" {
-  depends_on  = [aws_api_gateway_method.api_method, aws_api_gateway_resource.api_resource, aws_api_gateway_integration.lambda_integration]
+  depends_on  = [aws_api_gateway_method.api_method, aws_api_gateway_resource.api_resource, aws_api_gateway_integration.integration]
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
+
+  # Trigger for changes in methods or integrations
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_method.api_method))
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -139,29 +150,46 @@ resource "aws_api_gateway_stage" "stage" {
 }
 
 ##########################
-#    Specify IP Ranges   #
+#     REST API Policy    #
 ##########################
 data "aws_caller_identity" "current" {}
 
-resource "aws_api_gateway_rest_api_policy" "api_policy" {
-  for_each = toset(var.stage_names)
-
-  rest_api_id = aws_api_gateway_rest_api.api_gw.id
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect    = "Allow",
-        Principal = "*",
-        Action    = "execute-api:Invoke",
-        Resource  = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*",
-        Condition = {
-          IpAddress = {
-            "aws:SourceIp" = var.allowed_ip_ranges[each.value]
-          }
+locals {
+  policy_statements = [
+    {
+      Effect    = "Allow",
+      Principal = "*",
+      Action    = "execute-api:Invoke",
+      Resource  = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*",
+      Condition = {
+        IpAddress = {
+          "aws:SourceIp" = var.allowed_ip_ranges
         }
       }
-    ]
+    },
+    # Only add the Deny statement if use_private_endpoint is true
+    var.create_private_endpoint ? {
+      Effect = "Deny",
+      Principal = "*",
+      Action = "execute-api:Invoke",
+      Resource = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*",
+      Condition = {
+        StringNotEquals = {
+          "aws:sourceVpce" = var.vpc_endpoint_ids
+        }
+      }
+    } : null
+  ]
+  # Filter out the null values from the policy statements
+  filtered_policy_statements = [for policy in local.policy_statements : policy if policy != null]
+}
+
+resource "aws_api_gateway_rest_api_policy" "api_policy" {
+  rest_api_id = aws_api_gateway_rest_api.api_gw.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = local.filtered_policy_statements
   })
 }
 
@@ -237,15 +265,12 @@ resource "aws_api_gateway_account" "api_gateway_account" {
   cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch_role.arn
 }
 
-
 ##########################
 #       VPC Links        #
 ##########################
 resource "aws_api_gateway_vpc_link" "vpc_link" {
-  count       = var.create_vpc_link ? 1 : 0 # Conditional creation
-  name        = "${module.resource_name_prefix.resource_name}-vpc-link"
-  description = "VPC link for ${module.resource_name_prefix.resource_name} API"
-  target_arns = var.vpc_link_target_arns
+  count             = var.create_vpc_link ? 1 : 0  # Conditional creation
+  name              = "${module.resource_name_prefix.resource_name}-vpc-link"
+  description       = "VPC link for ${module.resource_name_prefix.resource_name} API"
+  target_arns       = var.vpc_link_target_arns # 06/11/2023 - Note: Currently AWS only supports 1 target
 }
-
-

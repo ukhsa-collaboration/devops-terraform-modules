@@ -16,7 +16,7 @@ resource "aws_api_gateway_rest_api" "api_gw" {
   description = "REST API Gateway for ${module.resource_name_prefix.resource_name}"
 
   endpoint_configuration {
-    types            = var.create_private_endpoint ? ["PRIVATE"] : ["EDGE", "REGIONAL"]
+    types            = var.create_private_endpoint ? ["PRIVATE"] : ["EDGE"]
     vpc_endpoint_ids = var.create_private_endpoint ? var.vpc_endpoint_ids : null
   }
 

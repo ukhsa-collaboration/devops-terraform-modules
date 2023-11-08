@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "api_gateway" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.3"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.4"
 
   name = var.name
 

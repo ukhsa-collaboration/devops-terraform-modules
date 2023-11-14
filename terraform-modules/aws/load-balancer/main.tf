@@ -2,7 +2,7 @@
 #     Naming Config      #
 ##########################
 module "resource_name_prefix" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix?ref=TF/helpers/resource-name-prefix/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix?ref=TF/helpers/resource-name-prefix/vALPHA_0.0.2"
 
   name = var.name
   tags = var.tags

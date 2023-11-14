@@ -1,5 +1,5 @@
 module "tags" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=tags/vALPHA_0.0.0"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
 
   project     = var.project
   client      = var.client
@@ -11,7 +11,7 @@ module "tags" {
 }
 
 module "subnets" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=subnet/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/subnet?ref=TF/aws/subnet/vALPHA_0.0.2"
 
   name               = var.name
   vpc_id             = var.vpc_id
@@ -22,7 +22,7 @@ module "subnets" {
 
 
 module "ec2_autoscale" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=TF/aws/ec2-autoscale/vALPHA_0.0.2"
 
   name                 = var.name
   ami                  = var.ec2_ami
@@ -63,7 +63,7 @@ module "ec2_autoscale" {
 }
 
 module "load_balancer" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=load-balancer/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/load-balancer?ref=TF/aws/load-balancer/vALPHA_0.0.2"
 
   name = var.name
 
@@ -165,7 +165,7 @@ module "load_balancer" {
   tags = module.tags.tags
 }
 module "domain_routing" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=domain-routing/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/domain-routing?ref=TF/aws/domain-routing/vALPHA_0.0.2"
 
   name   = var.name
   vpc_id = var.vpc_id
@@ -190,7 +190,7 @@ module "domain_routing" {
 }
 
 module "cognito" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=cognito/vALPHA_0.0.1"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/cognito?ref=TF/aws/cognito/vALPHA_0.0.2"
 
   name                        = var.name
   lambda_auth_challenge_arn   = var.lambda_cognito_pre_signup_arn

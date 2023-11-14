@@ -6,9 +6,13 @@ variable "name" {
   type        = string
 }
 
-
 variable "lambda_auth_challenge_arn" {
   description = "ARN for the Lambda function used for auth challenge"
+  type        = string
+}
+
+variable "lambda_function_name" {
+  description = "The name of the Lambda function."
   type        = string
 }
 

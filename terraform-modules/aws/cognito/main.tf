@@ -8,6 +8,10 @@ module "resource_name_prefix" {
   tags = var.tags
 }
 
+
+##########################
+#         Cognito        #
+##########################
 resource "aws_cognito_user_pool" "cognito_user_pool" {
   name                     = "${module.resource_name_prefix.resource_name}-cognito-up"
   username_attributes      = ["email"]
@@ -25,7 +29,7 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
   }
 
   lambda_config {
-    create_auth_challenge = var.lambda_auth_challenge_arn
+    pre_sign_up  = var.lambda_auth_challenge_arn
   }
 
   password_policy {
@@ -46,7 +50,6 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
       }
     }
   }
-
 }
 
 resource "aws_cognito_user_pool_client" "client" {
@@ -71,4 +74,16 @@ resource "aws_cognito_user_pool_client" "client" {
 resource "aws_cognito_user_pool_domain" "domain" {
   domain       = var.domain
   user_pool_id = aws_cognito_user_pool.cognito_user_pool.id
+}
+
+##########################
+#          IAM           #
+##########################
+data "aws_caller_identity" "current" {}
+resource "aws_lambda_permission" "allow_cognito" {
+  statement_id  = "AllowExecutionFromCognito"
+  action        = "lambda:InvokeFunction"
+  function_name = var.lambda_function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.cognito_user_pool.arn
 }

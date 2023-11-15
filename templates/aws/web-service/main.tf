@@ -31,15 +31,7 @@ module "ec2_autoscale" {
   vpc_zone_identifiers = module.subnets.subnet_ids
   target_group_arns    = module.load_balancer.target_group_arns
 
-  # For testing
-  user_data = <<-EOF
-    #!/bin/bash
-    sudo apt-get update -y
-    sudo apt-get install -y netcat-traditional
-    while true; do 
-      echo -e "HTTP/1.1 200 OK\n\n<h1>Hello, World from EC2 User Data!</h1>" | nc -l -p 8501 -q 1;
-    done & 
-  EOF
+  user_data = var.ec2_userdata
 
   ingress_rules = [
     {
@@ -176,7 +168,7 @@ module "domain_routing" {
   routes = [
     {
       cidr_block = "0.0.0.0/0",
-      gateway_id = "igw-0dbe98ec578dae53e"
+      gateway_id = var.internet_gateway_id
     }
   ]
 
@@ -202,7 +194,8 @@ module "cognito_pre_signup_lambda" {
 }
 
 module "cognito" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cognito?ref=TF/aws/cognito/vALPHA_0.0.3"
+  # source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cognito?ref=TF/aws/cognito/vALPHA_0.0.3"
+  source = "../../../terraform-modules/aws/cognito"
 
   name                        = var.name
   lambda_auth_challenge_arn   = module.cognito_pre_signup_lambda.lambda_function_arn

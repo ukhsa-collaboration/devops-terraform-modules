@@ -63,6 +63,16 @@ variable "ec2_type" {
   type        = string
 }
 
+variable "ec2_userdata" {
+  description = "EC2 User Data"
+  type        = string
+}
+
+variable "internet_gateway_id" {
+  description = "Internet gateway id for domain routing"
+  type        = string
+}
+
 variable "subdomain_prefix" {
   description = "Domain Name"
   type        = string
@@ -70,11 +80,6 @@ variable "subdomain_prefix" {
 
 variable "primary_domain" {
   description = "The name of the Route 53 hosted zone (domain name)."
-  type        = string
-}
-
-variable "lambda_cognito_pre_signup_arn" {
-  description = "The ARN of the Lambda function for Cognito pre-signup."
   type        = string
 }
 

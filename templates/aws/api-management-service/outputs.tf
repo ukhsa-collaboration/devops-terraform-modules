@@ -40,9 +40,9 @@ output "cloudwatch_log_group_name" {
   description = "The names of the CloudWatch Log Groups for each stage."
 }
 
-output "cloudwatch_role_arn" {
-  value       = module.api_gateway.cloudwatch_role_arn
-  description = "The ARN of the IAM role used for CloudWatch logging"
+output "api_gateway_role_arn" {
+  description = "The ARN of the API Gateway role"
+  value       = module.api_gateway.api_gateway_role_arn
 }
 
 ####### WAF Outputs ######

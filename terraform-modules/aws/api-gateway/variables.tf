@@ -18,6 +18,7 @@ variable "endpoints" {
   type = map(object({
     path    = string
     methods = list(string)
+    authorization = string  
   }))
   description = "A map of endpoint configurations, each with a path and a list of methods"
 }

@@ -44,7 +44,12 @@ output "cloudwatch_log_group_name" {
   description = "The names of the CloudWatch Log Groups for each stage."
 }
 
-output "cloudwatch_role_arn" {
-  value       = aws_iam_role.api_gateway_cloudwatch_role.arn
-  description = "The ARN of the IAM role used for CloudWatch logging"
+output "api_gateway_role_id" {
+  description = "The ID of the API Gateway role"
+  value       = aws_iam_role.api_gateway_role.id
+}
+
+output "api_gateway_role_arn" {
+  description = "The ARN of the API Gateway role"
+  value       = aws_iam_role.api_gateway_role.arn
 }

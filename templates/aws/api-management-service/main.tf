@@ -25,10 +25,12 @@ module "api_gateway" {
     example = {
       path    = "example"
       methods = ["POST", "GET"]
+      authorization = "AWS_IAM" 
     },
     example2 = {
       path    = "example2"
       methods = ["POST"]
+      authorization = "AWS_IAM" 
     }
   }
 

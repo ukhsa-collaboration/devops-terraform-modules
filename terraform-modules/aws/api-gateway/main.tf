@@ -30,6 +30,7 @@ locals {
         key    = key
         path   = endpoint.path
         method = method
+        authorization = endpoint.authorization
       }
     ]
   ])
@@ -49,7 +50,8 @@ resource "aws_api_gateway_method" "api_method" {
   rest_api_id   = aws_api_gateway_rest_api.api_gw.id
   resource_id   = aws_api_gateway_resource.api_resource[each.value.key].id
   http_method   = each.value.method
-  authorization = "NONE" # Assuming no authorization for simplicity
+  authorization = each.value.authorization
+  api_key_required = true
 }
 
 ############################
@@ -194,6 +196,52 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
 }
 
 ##########################
+#       VPC Links        #
+##########################
+resource "aws_api_gateway_vpc_link" "vpc_link" {
+  count       = var.create_vpc_link ? 1 : 0 # Conditional creation
+  name        = "${module.resource_name_prefix.resource_name}-vpc-link"
+  description = "VPC link for ${module.resource_name_prefix.resource_name} API"
+  target_arns = var.vpc_link_target_arns # 06/11/2023 - Note: Currently AWS only supports 1 target
+}
+
+##########################
+#          IAM           #
+##########################
+resource "aws_iam_role" "api_gateway_role" {
+  name = "${module.resource_name_prefix.resource_name}-api-gw-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Principal = {
+          Service = "apigateway.amazonaws.com"
+        },
+        Effect = "Allow",
+        Sid = ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "api_invoke_policy" {
+  name   = "${module.resource_name_prefix.resource_name}-invoke-policy"
+  role   = aws_iam_role.api_gateway_role.id
+
+  policy = jsonencode({
+    Version   = "2012-10-17",
+    Statement = [{
+      Action   = ["execute-api:Invoke"],
+      Effect   = "Allow",
+      Resource = ["arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/*/*/*"]
+    }]
+  })
+}
+
+
+##########################
 #      CloudWatch        #
 ##########################
 resource "aws_cloudwatch_log_group" "api_log_group" {
@@ -201,26 +249,6 @@ resource "aws_cloudwatch_log_group" "api_log_group" {
 
   name              = "${module.resource_name_prefix.resource_name}-api-gw-${each.value}-stage-logs"
   retention_in_days = var.log_retention_in_days
-}
-
-resource "aws_iam_role" "api_gateway_cloudwatch_role" {
-  name = "${module.resource_name_prefix.resource_name}-api-gw-role"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "apigateway.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
 }
 
 resource "aws_iam_policy" "api_cloudwatch_logging_policy" {
@@ -257,20 +285,10 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "api_gw_cloudwatch_policy_attachment" {
-  role       = aws_iam_role.api_gateway_cloudwatch_role.name
+  role       = aws_iam_role.api_gateway_role.name
   policy_arn = aws_iam_policy.api_cloudwatch_logging_policy.arn
 }
 
 resource "aws_api_gateway_account" "api_gateway_account" {
-  cloudwatch_role_arn = aws_iam_role.api_gateway_cloudwatch_role.arn
-}
-
-##########################
-#       VPC Links        #
-##########################
-resource "aws_api_gateway_vpc_link" "vpc_link" {
-  count       = var.create_vpc_link ? 1 : 0 # Conditional creation
-  name        = "${module.resource_name_prefix.resource_name}-vpc-link"
-  description = "VPC link for ${module.resource_name_prefix.resource_name} API"
-  target_arns = var.vpc_link_target_arns # 06/11/2023 - Note: Currently AWS only supports 1 target
+  cloudwatch_role_arn = aws_iam_role.api_gateway_role.arn
 }

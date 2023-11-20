@@ -25,6 +25,15 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
       mutable                  = schema.value["mutable"]
       name                     = schema.value["name"]
       required                 = schema.value["required"]
+
+      # string_attribute_constraints only requeried when attribute_data_type is string
+      dynamic "string_attribute_constraints" {
+        for_each = schema.value["attribute_data_type"] == "String" ? [1] : []
+        content {
+          min_length = 0
+          max_length = 2048
+        }
+      }
     }
   }
 

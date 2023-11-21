@@ -47,13 +47,24 @@ module "api_gateway" {
     rate_limit  = 100
   }
 
+  # API GW input valdiation
+  model_schema = {
+    name         = "Example"
+    description  = "An example schema description"
+    content_type = "application/json"
+    schema       = jsonencode({
+      type       = "object",
+      properties = {}
+    })
+  }
+
   # API Gateway Integration
   integration_uri  = aws_lambda_function.lambda.invoke_arn
   integration_type = "AWS_PROXY"
 
   # VPC Links
   create_vpc_link      = false
-  vpc_link_target_arns = ["my-vpc-arn"]
+  vpc_link_target_arns = ["target_arn"]
 
   # Private Endpoints
   create_private_endpoint = false

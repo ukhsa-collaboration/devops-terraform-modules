@@ -47,11 +47,12 @@ resource "aws_api_gateway_resource" "api_resource" {
 resource "aws_api_gateway_method" "api_method" {
   for_each = { for idx, endpoint in local.expanded_endpoints : "${endpoint.key}-${endpoint.method}" => endpoint }
 
-  rest_api_id   = aws_api_gateway_rest_api.api_gw.id
-  resource_id   = aws_api_gateway_resource.api_resource[each.value.key].id
-  http_method   = each.value.method
-  authorization = each.value.authorization
-  api_key_required = true
+  rest_api_id        = aws_api_gateway_rest_api.api_gw.id
+  resource_id        = aws_api_gateway_resource.api_resource[each.value.key].id
+  http_method        = each.value.method
+  authorization      = each.value.authorization
+  api_key_required   = true
+  request_models     = { (var.model_schema.content_type) = aws_api_gateway_model.request_model.name }
 }
 
 ############################
@@ -196,6 +197,25 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
 }
 
 ##########################
+#   Input validation     #
+##########################
+# At current this config only supports one model for all methods. This can be improved when theres more time
+resource "aws_api_gateway_model" "request_model" {
+  rest_api_id = aws_api_gateway_rest_api.api_gw.id
+  name        = var.model_schema.name
+  description  = var.model_schema.description
+  content_type= var.model_schema.content_type
+  schema      = var.model_schema.schema
+}
+
+resource "aws_api_gateway_request_validator" "request_validator" {
+  name                        = "${module.resource_name_prefix.resource_name}-api-gw-validator"
+  rest_api_id                 = aws_api_gateway_rest_api.api_gw.id
+  validate_request_body       = true
+  validate_request_parameters = true
+}
+
+##########################
 #       VPC Links        #
 ##########################
 resource "aws_api_gateway_vpc_link" "vpc_link" {
@@ -239,7 +259,6 @@ resource "aws_iam_role_policy" "api_invoke_policy" {
     }]
   })
 }
-
 
 ##########################
 #      CloudWatch        #

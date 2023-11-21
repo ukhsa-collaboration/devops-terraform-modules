@@ -95,10 +95,35 @@ variable "throttle_settings" {
 }
 
 ##########################
+#   Input validation    #
+##########################
+variable "model_schema" {
+  description = "The model schema for request validation"
+  type = object({
+    name        : string
+    description : string
+    content_type: string
+    schema      : string
+  })
+  default = {
+    name         = "DefaultModel"
+    description = "Default Terraform Module Model Scheme"
+    content_type = "application/json"
+    schema       = <<EOF
+{
+  "type": "object",
+  "properties": {}
+}
+EOF
+  }
+}
+
+##########################
 #       VPC Links        #
 ##########################
 variable "create_vpc_link" {
   description = "Whether to create a VPC Link for the API Gateway integration"
+  type        = bool
   default     = false
 }
 

@@ -27,9 +27,9 @@ locals {
   expanded_endpoints = flatten([
     for key, endpoint in var.endpoints : [
       for method in endpoint.methods : {
-        key    = key
-        path   = endpoint.path
-        method = method
+        key           = key
+        path          = endpoint.path
+        method        = method
         authorization = endpoint.authorization
       }
     ]
@@ -47,12 +47,13 @@ resource "aws_api_gateway_resource" "api_resource" {
 resource "aws_api_gateway_method" "api_method" {
   for_each = { for idx, endpoint in local.expanded_endpoints : "${endpoint.key}-${endpoint.method}" => endpoint }
 
-  rest_api_id        = aws_api_gateway_rest_api.api_gw.id
-  resource_id        = aws_api_gateway_resource.api_resource[each.value.key].id
-  http_method        = each.value.method
-  authorization      = each.value.authorization
-  api_key_required   = true
-  request_models     = { (var.model_schema.content_type) = aws_api_gateway_model.request_model.name }
+  rest_api_id      = aws_api_gateway_rest_api.api_gw.id
+  resource_id      = aws_api_gateway_resource.api_resource[each.value.key].id
+  http_method      = each.value.method
+  request_models   = { (var.model_schema.content_type) = aws_api_gateway_model.request_model.name }
+  authorization    = each.value.authorization == "CUSTOM" ? "CUSTOM" : each.value.authorization
+  authorizer_id    = each.value.authorization == "CUSTOM" ? aws_api_gateway_authorizer.lambda_authorizer[0].id : null
+  api_key_required = true
 }
 
 ############################
@@ -116,6 +117,48 @@ resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
   usage_plan_id = aws_api_gateway_usage_plan.usage_plan.id
 }
 
+############################
+#    Custom Authorizers    #
+############################
+locals {
+  # First check if any of the endpoints specified has set their auth to custom
+  needs_custom_authorizer = contains([for endpoint in var.endpoints : endpoint.authorization], "CUSTOM")
+}
+
+module "lambda_custom_auth" {
+  count  = local.needs_custom_authorizer ? 1 : 0
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/lambda?ref=TF/aws/lambda/vALPHA_0.0.3"
+
+  name       = "${module.resource_name_prefix.resource_name}-api-gw-authorizer"
+  runtime    = var.custom_auth_lambda.runtime
+  handler    = var.custom_auth_lambda.handler
+  filename   = var.custom_auth_lambda.filename
+  aws_region = var.custom_auth_lambda.aws_region
+
+  tags = var.tags
+}
+
+# Conditional creation of the Lambda authorizer
+resource "aws_api_gateway_authorizer" "lambda_authorizer" {
+  count                            = local.needs_custom_authorizer ? 1 : 0
+  name                             = "lambda-authorizer"
+  rest_api_id                      = aws_api_gateway_rest_api.api_gw.id
+  authorizer_uri                   = module.lambda_custom_auth[0].lambda_function_invoke_arn
+  authorizer_result_ttl_in_seconds = 300
+  identity_source                  = "method.request.header.${var.custom_auth_lambda.authTokenHeader}"
+  type                             = "REQUEST"
+}
+
+# Give API Gateway Permsission to use the lambda
+resource "aws_lambda_permission" "api_gw_lambda_invoke" {
+  count         = local.needs_custom_authorizer ? 1 : 0
+  statement_id  = "${module.resource_name_prefix.resource_name}-allow-lambda-exec-from-api-gw"
+  action        = "lambda:InvokeFunction"
+  function_name = module.lambda_custom_auth[0].lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.api_gw.id}/authorizers/${aws_api_gateway_authorizer.lambda_authorizer[0].id}"
+}
+
 ##########################
 #     API Deployment     #
 ##########################
@@ -123,9 +166,13 @@ resource "aws_api_gateway_deployment" "deployment" {
   depends_on  = [aws_api_gateway_method.api_method, aws_api_gateway_resource.api_resource, aws_api_gateway_integration.integration]
   rest_api_id = aws_api_gateway_rest_api.api_gw.id
 
-  # Trigger for changes in methods or integrations
+  # Trigger for changes in API configuration
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_method.api_method))
+    redeployment = sha256(jsonencode({
+      resources    = [for r in aws_api_gateway_resource.api_resource : r.id],
+      methods      = [for m in aws_api_gateway_method.api_method : m.id],
+      integrations = [for i in aws_api_gateway_integration.integration : i.id]
+    }))
   }
 
   lifecycle {
@@ -201,11 +248,11 @@ resource "aws_api_gateway_rest_api_policy" "api_policy" {
 ##########################
 # At current this config only supports one model for all methods. This can be improved when theres more time
 resource "aws_api_gateway_model" "request_model" {
-  rest_api_id = aws_api_gateway_rest_api.api_gw.id
-  name        = var.model_schema.name
+  rest_api_id  = aws_api_gateway_rest_api.api_gw.id
+  name         = var.model_schema.name
   description  = var.model_schema.description
-  content_type= var.model_schema.content_type
-  schema      = var.model_schema.schema
+  content_type = var.model_schema.content_type
+  schema       = var.model_schema.schema
 }
 
 resource "aws_api_gateway_request_validator" "request_validator" {
@@ -228,6 +275,8 @@ resource "aws_api_gateway_vpc_link" "vpc_link" {
 ##########################
 #          IAM           #
 ##########################
+# Please note the trust relationship also needs allow assume role from that user/role arn so this will need to
+# be updated to include user/role arns that want to assume this role.
 resource "aws_iam_role" "api_gateway_role" {
   name = "${module.resource_name_prefix.resource_name}-api-gw-role"
 
@@ -240,18 +289,18 @@ resource "aws_iam_role" "api_gateway_role" {
           Service = "apigateway.amazonaws.com"
         },
         Effect = "Allow",
-        Sid = ""
+        Sid    = ""
       }
     ]
   })
 }
 
 resource "aws_iam_role_policy" "api_invoke_policy" {
-  name   = "${module.resource_name_prefix.resource_name}-invoke-policy"
-  role   = aws_iam_role.api_gateway_role.id
+  name = "${module.resource_name_prefix.resource_name}-invoke-policy"
+  role = aws_iam_role.api_gateway_role.id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [{
       Action   = ["execute-api:Invoke"],
       Effect   = "Allow",

@@ -16,9 +16,9 @@ variable "aws_region" {
 
 variable "endpoints" {
   type = map(object({
-    path    = string
-    methods = list(string)
-    authorization = string  
+    path          = string
+    methods       = list(string)
+    authorization = string
   }))
   description = "A map of endpoint configurations, each with a path and a list of methods"
 }
@@ -34,6 +34,29 @@ variable "integration_uri" {
 variable "integration_type" {
   description = "The integration type of your resource."
   type        = string
+}
+
+
+############################
+#    Custom Authorizers    #
+############################
+variable "custom_auth_lambda" {
+  description = "Configuration for the Lambda function"
+  type = object({
+    runtime         = string
+    handler         = string
+    filename        = string
+    authTokenHeader = string
+    aws_region      = string
+  })
+  # You can set default values if appropriate
+  default = {
+    runtime         = ""
+    handler         = ""
+    filename        = ""
+    authTokenHeader = ""
+    aws_region      = ""
+  }
 }
 
 ##########################
@@ -66,7 +89,7 @@ variable "log_retention_in_days" {
 }
 
 ##########################
-#     Other Settings     #
+#     Throttle/Quota     #
 ##########################
 variable "quota_settings" {
   type = object({
@@ -100,14 +123,14 @@ variable "throttle_settings" {
 variable "model_schema" {
   description = "The model schema for request validation"
   type = object({
-    name        : string
+    name : string
     description : string
-    content_type: string
-    schema      : string
+    content_type : string
+    schema : string
   })
   default = {
     name         = "DefaultModel"
-    description = "Default Terraform Module Model Scheme"
+    description  = "Default Terraform Module Model Scheme"
     content_type = "application/json"
     schema       = <<EOF
 {

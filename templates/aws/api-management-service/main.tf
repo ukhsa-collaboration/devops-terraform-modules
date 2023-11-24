@@ -11,7 +11,8 @@ module "tags" {
 }
 
 module "api_gateway" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.5"
+  # source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.5"
+  source = "../../../terraform-modules/aws/api-gateway"
 
   name = var.name
 
@@ -23,16 +24,29 @@ module "api_gateway" {
 
   endpoints = {
     example = {
-      path    = "example"
-      methods = ["POST", "GET"]
-      authorization = "AWS_IAM" 
+      path          = "example"
+      methods       = ["POST", "GET"]
+      authorization = "AWS_IAM"
     },
     example2 = {
-      path    = "example2"
-      methods = ["POST"]
-      authorization = "AWS_IAM" 
+      path          = "example2"
+      methods       = ["POST"]
+      authorization = "CUSTOM"
     }
   }
+
+  # Custom Authoirzation
+  custom_auth_lambda = {
+    runtime         = "python3.8"
+    handler         = "lambda_function.lambda_handler"
+    filename        = "custom_auth_lambda_payload.zip"
+    authTokenHeader = "authToken" # header of the request container the token
+    aws_region      = var.aws_region
+  }
+
+  # API Gateway Integration
+  integration_uri  = aws_lambda_function.lambda.invoke_arn
+  integration_type = "AWS_PROXY"
 
   log_retention_in_days = 1
 
@@ -52,15 +66,11 @@ module "api_gateway" {
     name         = "Example"
     description  = "An example schema description"
     content_type = "application/json"
-    schema       = jsonencode({
+    schema = jsonencode({
       type       = "object",
       properties = {}
     })
   }
-
-  # API Gateway Integration
-  integration_uri  = aws_lambda_function.lambda.invoke_arn
-  integration_type = "AWS_PROXY"
 
   # VPC Links
   create_vpc_link      = false
@@ -94,23 +104,23 @@ module "waf" {
   tags = module.tags.tags
 }
 
-module "cloudfront_distribution" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.2"
+# module "cloudfront_distribution" {
+#   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.2"
 
-  # Naming Config
-  name        = var.name
-  description = "API Gateway"
+#   # Naming Config
+#   name        = var.name
+#   description = "API Gateway"
 
-  # CloudFront Distribution
-  domain_name               = module.api_gateway.api_url
-  allowed_methods           = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-  cached_methods            = ["GET", "HEAD"]
-  geo_restriction_locations = ["GB"]
-  ttl                       = { min_ttl = 0, default_ttl = 3600, max_ttl = 86400 }
+#   # CloudFront Distribution
+#   domain_name               = module.api_gateway.api_url
+#   allowed_methods           = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+#   cached_methods            = ["GET", "HEAD"]
+#   geo_restriction_locations = ["GB"]
+#   ttl                       = { min_ttl = 0, default_ttl = 3600, max_ttl = 86400 }
 
-  # S3 Resources
-  s3_acl           = "private"
-  object_ownership = "BucketOwnerPreferred"
+#   # S3 Resources
+#   s3_acl           = "private"
+#   object_ownership = "BucketOwnerPreferred"
 
-  tags = module.tags.tags
-}
+#   tags = module.tags.tags
+# }

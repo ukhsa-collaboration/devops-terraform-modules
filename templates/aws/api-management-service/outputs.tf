@@ -82,32 +82,32 @@ output "cloudwatch_log_resource_policy_id" {
 }
 
 ####### CloudFront Distribution Outputs ######
-output "cloudfront_distribution_id" {
-  value       = module.cloudfront_distribution.cloudfront_distribution_id
-  description = "The ID of the CloudFront distribution."
-}
+# output "cloudfront_distribution_id" {
+#   value       = module.cloudfront_distribution.cloudfront_distribution_id
+#   description = "The ID of the CloudFront distribution."
+# }
 
-output "cloudfront_distribution_url" {
-  value       = module.cloudfront_distribution.cloudfront_distribution_url
-  description = "The domain name corresponding to the CloudFront distribution."
-}
+# output "cloudfront_distribution_url" {
+#   value       = module.cloudfront_distribution.cloudfront_distribution_url
+#   description = "The domain name corresponding to the CloudFront distribution."
+# }
 
-output "s3_bucket_id" {
-  value       = module.cloudfront_distribution.s3_bucket_id
-  description = "The ID of the S3 bucket for logs."
-}
+# output "s3_bucket_id" {
+#   value       = module.cloudfront_distribution.s3_bucket_id
+#   description = "The ID of the S3 bucket for logs."
+# }
 
-output "s3_bucket_arn" {
-  value       = module.cloudfront_distribution.s3_bucket_arn
-  description = "The ARN of the S3 bucket for logs."
-}
+# output "s3_bucket_arn" {
+#   value       = module.cloudfront_distribution.s3_bucket_arn
+#   description = "The ARN of the S3 bucket for logs."
+# }
 
-output "cloudfront_origin_access_identity_id" {
-  value       = module.cloudfront_distribution.cloudfront_origin_access_identity_id
-  description = "The ID of the CloudFront Origin Access Identity."
-}
+# output "cloudfront_origin_access_identity_id" {
+#   value       = module.cloudfront_distribution.cloudfront_origin_access_identity_id
+#   description = "The ID of the CloudFront Origin Access Identity."
+# }
 
-output "cloudfront_origin_access_identity_iam_arn" {
-  value       = module.cloudfront_distribution.cloudfront_origin_access_identity_iam_arn
-  description = "The IAM ARN of the CloudFront Origin Access Identity."
-}
+# output "cloudfront_origin_access_identity_iam_arn" {
+#   value       = module.cloudfront_distribution.cloudfront_origin_access_identity_iam_arn
+#   description = "The IAM ARN of the CloudFront Origin Access Identity."
+# }

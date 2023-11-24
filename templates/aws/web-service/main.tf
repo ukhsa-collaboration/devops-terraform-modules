@@ -184,10 +184,10 @@ module "domain_routing" {
 module "cognito_pre_signup_lambda" {
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/lambda?ref=TF/aws/lambda/vALPHA_0.0.1"
 
-  name = "cognito-pre-signup"
-  runtime = "nodejs14.x"
-  handler = "index.handler"
-  filename = "cognito_pre_signup_lambda_payload.zip"
+  name       = "cognito-pre-signup"
+  runtime    = "nodejs14.x"
+  handler    = "index.handler"
+  filename   = "cognito_pre_signup_lambda_payload.zip"
   aws_region = var.aws_region
 
   tags = module.tags.tags
@@ -199,7 +199,7 @@ module "cognito" {
 
   name                        = var.name
   lambda_auth_challenge_arn   = module.cognito_pre_signup_lambda.lambda_function_arn
-  lambda_function_name   = module.cognito_pre_signup_lambda.lambda_function_name
+  lambda_function_name        = module.cognito_pre_signup_lambda.lambda_function_name
   password_min_length         = 12
   temp_password_validity_days = 7
   token_validity              = 1

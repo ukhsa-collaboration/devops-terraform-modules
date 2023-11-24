@@ -15,7 +15,7 @@ resource "aws_lambda_function" "lambda" {
   function_name    = "${module.resource_name_prefix.resource_name}-lambda"
   role             = aws_iam_role.lambda_execution_role.arn
   runtime          = var.runtime
-  handler = var.handler
+  handler          = var.handler
   filename         = var.filename
   source_code_hash = filebase64sha256(var.filename)
 

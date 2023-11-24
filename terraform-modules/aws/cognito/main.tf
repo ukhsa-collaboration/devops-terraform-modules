@@ -38,7 +38,7 @@ resource "aws_cognito_user_pool" "cognito_user_pool" {
   }
 
   lambda_config {
-    pre_sign_up  = var.lambda_auth_challenge_arn
+    pre_sign_up = var.lambda_auth_challenge_arn
   }
 
   password_policy {

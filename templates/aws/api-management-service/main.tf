@@ -11,8 +11,7 @@ module "tags" {
 }
 
 module "api_gateway" {
-  # source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.5"
-  source = "../../../terraform-modules/aws/api-gateway"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/api-gateway?ref=TF/aws/api-gateway/vALPHA_0.0.6"
 
   name = var.name
 
@@ -104,23 +103,23 @@ module "waf" {
   tags = module.tags.tags
 }
 
-# module "cloudfront_distribution" {
-#   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.2"
+module "cloudfront_distribution" {
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.2"
 
-#   # Naming Config
-#   name        = var.name
-#   description = "API Gateway"
+  # Naming Config
+  name        = var.name
+  description = "API Gateway"
 
-#   # CloudFront Distribution
-#   domain_name               = module.api_gateway.api_url
-#   allowed_methods           = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-#   cached_methods            = ["GET", "HEAD"]
-#   geo_restriction_locations = ["GB"]
-#   ttl                       = { min_ttl = 0, default_ttl = 3600, max_ttl = 86400 }
+  # CloudFront Distribution
+  domain_name               = module.api_gateway.api_url
+  allowed_methods           = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+  cached_methods            = ["GET", "HEAD"]
+  geo_restriction_locations = ["GB"]
+  ttl                       = { min_ttl = 0, default_ttl = 3600, max_ttl = 86400 }
 
-#   # S3 Resources
-#   s3_acl           = "private"
-#   object_ownership = "BucketOwnerPreferred"
+  # S3 Resources
+  s3_acl           = "private"
+  object_ownership = "BucketOwnerPreferred"
 
-#   tags = module.tags.tags
-# }
+  tags = module.tags.tags
+}

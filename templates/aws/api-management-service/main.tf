@@ -104,7 +104,7 @@ module "waf" {
 }
 
 module "cloudfront_distribution" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.2"
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/cloudfront-distribution?ref=TF/aws/cloudfront-distribution/vALPHA_0.0.3"
 
   # Naming Config
   name        = var.name

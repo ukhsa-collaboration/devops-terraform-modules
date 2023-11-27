@@ -66,7 +66,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
 
   logging_config {
     include_cookies = false
-    bucket          = aws_s3_bucket.logs.bucket_domain_name
+    bucket          = module.s3_bucket.bucket_domain_name
     prefix          = "cloudfront/logs/"
   }
 
@@ -76,41 +76,35 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
 ##########################
 #      S3 Resources      #
 ##########################
-locals {
-  s3_bucket_name = "${module.resource_name_prefix.resource_name}-cloudfront-logs"
-}
+module "s3_bucket" {
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/s3?ref=TF/aws/s3/vALPHA_0.0.1"
 
-resource "aws_s3_bucket" "logs" {
-  bucket = local.s3_bucket_name
-  tags   = var.tags
-}
-
-resource "aws_s3_bucket_ownership_controls" "example" {
-  bucket = aws_s3_bucket.logs.id
-  rule {
-    object_ownership = var.object_ownership
-  }
-}
-
-resource "aws_s3_bucket_acl" "example" {
-  depends_on = [aws_s3_bucket_ownership_controls.example]
-
-  bucket = aws_s3_bucket.logs.id
-  acl    = var.s3_acl
+  # You can override these variables as per your requirements
+  name               = var.name
+  bucket_name        = "cloudfront-logs"
+  bucket_acl         = "private"
+  bucket_ownership = "BucketOwnerPreferred"
+  force_destroy      = false
+  versioning_enabled = true
+  encryption_algorithm = "AES256"
+  lifecycle_rule_enabled = true
+  noncurrent_version_expiration_days = 30
+  expiration_days    = 90
+  tags = var.tags
 }
 
 ##########################
-#  CloudFront OAI Config #
+#  CloudFront OAI Config #`
 ##########################
 resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "OAI for CloudFront to access ${local.s3_bucket_name} S3 bucket"
+  comment = "OAI for CloudFront to access ${module.s3_bucket.bucket_id} S3 bucket"
 }
 
 ##########################
 #   S3 Bucket Policy     #
 ##########################
 resource "aws_s3_bucket_policy" "logs_policy" {
-  bucket = aws_s3_bucket.logs.id
+  bucket = module.s3_bucket.bucket_id
 
   policy = <<POLICY
 {
@@ -122,7 +116,7 @@ resource "aws_s3_bucket_policy" "logs_policy" {
         "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.oai.id}"
       },
       "Action": "s3:PutObject",
-      "Resource": "${aws_s3_bucket.logs.arn}/*"
+      "Resource": "${module.s3_bucket.bucket_arn}/*"
     }
   ]
 }

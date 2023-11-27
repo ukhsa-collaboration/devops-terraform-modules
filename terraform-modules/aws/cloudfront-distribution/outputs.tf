@@ -15,12 +15,12 @@ output "cloudfront_distribution_url" {
 #      S3 Resources      #
 ##########################
 output "s3_bucket_id" {
-  value       = aws_s3_bucket.logs.id
+  value       = module.s3_bucket.bucket_id
   description = "The ID of the S3 bucket for logs."
 }
 
 output "s3_bucket_arn" {
-  value       = aws_s3_bucket.logs.arn
+  value       = module.s3_bucket.bucket_arn
   description = "The ARN of the S3 bucket for logs."
 }
 

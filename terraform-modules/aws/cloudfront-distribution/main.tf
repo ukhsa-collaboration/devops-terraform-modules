@@ -80,17 +80,17 @@ module "s3_bucket" {
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/aws/s3?ref=TF/aws/s3/vALPHA_0.0.1"
 
   # You can override these variables as per your requirements
-  name               = var.name
-  bucket_name        = "cloudfront-logs"
-  bucket_acl         = "private"
-  bucket_ownership = "BucketOwnerPreferred"
-  force_destroy      = false
-  versioning_enabled = true
-  encryption_algorithm = "AES256"
-  lifecycle_rule_enabled = true
+  name                               = var.name
+  bucket_name                        = "cloudfront-logs"
+  bucket_acl                         = "private"
+  bucket_ownership                   = "BucketOwnerPreferred"
+  force_destroy                      = false
+  versioning_enabled                 = true
+  encryption_algorithm               = "AES256"
+  lifecycle_rule_enabled             = true
   noncurrent_version_expiration_days = 30
-  expiration_days    = 90
-  tags = var.tags
+  expiration_days                    = 90
+  tags                               = var.tags
 }
 
 ##########################

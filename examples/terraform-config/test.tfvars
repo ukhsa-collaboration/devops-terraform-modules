@@ -6,7 +6,7 @@ project = "poc-4"
 client = "my-client"
 owner = "UKHSA"
 environment = "dev"
-name = "iac-poc"
+name = "iac-poc-"
 aws_region = "eu-west-2"
 allowed_ip_ranges = "["0.0.0.0/0"]"
 

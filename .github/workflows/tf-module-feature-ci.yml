@@ -1,0 +1,149 @@
+name: TF Module Feature CI
+
+on:
+  push:
+    branches:
+      - feature/*
+    paths:
+    - 'terraform-modules/**/*.tf'
+
+jobs:
+  pre-build:
+    name: pre-build
+    runs-on: ubuntu-latest
+    outputs:
+      is_pull_request: ${{ steps.check_event.outputs.is_pr }}
+      changed_directories: ${{ steps.process_files_changes.outputs.changed_tf_dirs }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check Event Type
+        id: check_event
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "::set-output name=is_pr::true"
+          else
+            echo "::set-output name=is_pr::false"
+          fi
+
+      - name: Identify Changed Terraform Files from Dev Branch
+        id: identify_changed_files
+        run: |
+          changed_files=$(git diff --name-only origin/dev HEAD | grep '\.tf$')
+          changed_files=$(echo $changed_files | tr '\n' ' ')
+          echo "Changed Terraform files: $changed_files"
+          echo "::set-output name=changed_tf_files::$changed_files"
+
+      - name: Process Changed Files from Dev Branch
+        id: process_files_changes
+        run: |
+          # Get the list of changed files
+          changed_files="${{ steps.identify_changed_files.outputs.changed_tf_files }}"
+          
+          # Extract unique directory names from the file paths
+          IFS=' ' read -ra ADDR <<< "$changed_files"
+          changed_dirs=""
+          for file in "${ADDR[@]}"; do
+            dir=$(dirname "$file")
+            if [[ ! " $changed_dirs " =~ " $dir " ]]; then
+              changed_dirs+="$dir "
+            fi
+          done
+          changed_dirs=$(echo $changed_dirs | xargs)  # Trim extra spaces
+          
+          echo "Directories with changes: $changed_dirs"
+          echo "::set-output name=changed_tf_dirs::$changed_dirs"
+
+  terraform-lint-and-validate:
+    name: Terraform Lint and Validation
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.6
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
+
+      - name: Terraform Initialize
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          for dir in $changed_dirs; do
+            (cd $dir && terraform init)
+          done
+
+      - name: Check Terraform Format
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          for dir in $changed_dirs; do
+            # Change to each directory and check formatting
+            (cd "$dir" && terraform fmt -check) || {
+              echo "Formatting issues found in $dir. Please run 'terraform fmt -recursive' to fix them."
+              exit 1
+            }
+          done
+
+      - name: Validate Terraform
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          for dir in $changed_dirs; do
+            (cd $dir && terraform validate)
+          done
+
+      # - name: Terraform Plan
+      #   run: |
+      #     for dir in ${{ needs.pre-build.outputs.changed_directories }}; do
+      #       cd $dir && terraform plan
+      #     done
+
+  terraform-security-scan:
+    name: Terraform Security Scan
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.6
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          for dir in $changed_dirs; do
+            echo "Running Checkov on directory: $dir"
+            checkov -d $dir --download-external-modules true || true
+          done

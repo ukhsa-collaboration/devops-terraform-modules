@@ -1,0 +1,224 @@
+name: TF Module Prod CI
+
+on:
+  push:
+    branches:
+      - prod
+    paths:
+    - 'terraform-modules/**/*.tf'
+  pull_request:
+    branches:
+      - prod
+    paths:
+    - 'terraform-modules/**/*.tf'
+
+env:
+  TF_MODULE_DIR: "terraform-modules" 
+  ENVIRONMENT: "prod"
+
+jobs:
+  pre-build:
+    name: pre-build
+    runs-on: ubuntu-latest
+    outputs:
+      is_pull_request: ${{ steps.check_event.outputs.is_pr }}
+      tf_module_dirs: ${{ steps.get_tf_module_dirs.outputs.tf_module_directories }}
+      changed_directories: ${{ steps.process_files_changes.outputs.changed_tf_dirs }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Check Event Type
+        id: check_event
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            echo "::set-output name=is_pr::true"
+          else
+            echo "::set-output name=is_pr::false"
+          fi
+
+      - name: Get Terraform Module Dirs
+        id: get_tf_module_dirs
+        run: |
+          root_dir="terraform-modules"
+          module_dirs=$(find "$root_dir" -name '*.tf' -print | awk -F/ '{OFS="/"; $NF=""; print $0}' | sort -u | xargs)
+          echo "Module Directories: $module_dirs"
+          echo "::set-output name=tf_module_directories::$module_dirs"
+
+      - name: Identify Changed Terraform Files
+        id: identify_changed_files
+        run: |
+          changed_files=$(git diff --name-only origin/dev HEAD | grep '\.tf$')
+          changed_files=$(echo $changed_files | tr '\n' ' ')
+          echo "Changed Terraform files: $changed_files"
+          echo "::set-output name=changed_tf_files::$changed_files"
+  
+      - name: Process Changed Files
+        id: process_files_changes
+        run: |
+          # Get the list of changed files
+          changed_files="${{ steps.identify_changed_files.outputs.changed_tf_files }}"
+          
+          # Extract unique directory names from the file paths
+          IFS=' ' read -ra ADDR <<< "$changed_files"
+          changed_dirs=""
+          for file in "${ADDR[@]}"; do
+          dir=$(dirname "$file")
+          if [[ ! " $changed_dirs " =~ " $dir " ]]; then
+              changed_dirs+="$dir "
+          fi
+          done
+          changed_dirs=$(echo $changed_dirs | xargs)  # Trim extra spaces
+          
+          echo "Changed Directories: $changed_dirs"
+          echo "::set-output name=changed_tf_dirs::$changed_dirs"
+
+  terraform-lint-and-validate:
+    name: Terraform Lint and Validation
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.6
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
+
+      - name: Terraform Initialize
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          for dir in $changed_dirs; do
+            (cd $dir && terraform init)
+          done
+
+      - name: Check Terraform Format
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          for dir in $changed_dirs; do
+            # Change to each directory and check formatting
+            (cd "$dir" && terraform fmt -check) || {
+              echo "Formatting issues found in $dir. Please run 'terraform fmt -recursive' to fix them."
+              exit 1
+            }
+          done
+
+      - name: Validate Terraform
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          for dir in $changed_dirs; do
+            (cd $dir && terraform validate)
+          done
+
+      # - name: Terraform Plan
+      #   run: |
+      #     for dir in ${{ needs.pre-build.outputs.tf_module_dirs }}; do
+      #       cd $dir && terraform plan
+      #     done
+
+  terraform-security-scan:
+    name: Terraform Security Scan
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.6
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          for dir in $changed_dirs; do
+            echo "Running Checkov on directory: $dir"
+            checkov -d $dir --download-external-modules true
+          done
+
+  release_module:
+    name: Release Module
+    needs: [ terraform-lint-and-validate, terraform-security-scan, pre-build ]
+    if: ${{ needs.pre-build.outputs.is_pull_request == 'false' }}
+    runs-on: ubuntu-latest   
+    steps:  
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Release Module
+        run: |
+          increment_version() {
+            local version=$1
+            local major minor patch
+            IFS='.' read -r major minor patch <<< "$version"
+            patch=$((patch + 1)) # Increment the patch number
+            echo "$major.$minor.$patch"
+          }
+          
+          get_latest_version() {
+              local module_tag=$1
+              local latest_tag=$(git tag --list "${module_tag}/v*" | sort -V | tail -n1)
+              echo "${latest_tag##*/}"
+          }
+          
+          # Set Changed Dirs
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+
+          # Set Environment
+          environment="${{ env.ENVIRONMENT }}"
+          environment="${environment^^}"
+
+          # Process Module Version tags
+          for dir in $changed_dirs; do
+            # Replace 'terraform-modules' with 'dev/TF' in directory
+            dir=$(echo "$dir" | sed "s|terraform-modules|$environment/TF|")
+
+            latest_version=$(get_latest_version $dir)
+            if [ -z "$latest_version" ]; then
+                echo "No existing tags found for $dir. Starting with version v0.0.1"
+                new_version="v0.0.1"
+            else
+                new_version=$(increment_version $latest_version)
+            fi
+
+            # Create new Tag
+            new_tag="${dir}/${new_version}"
+            echo "New Version: $new_tag"
+
+            # Tag Git
+            git tag $new_tag && git push origin $new_tag
+          done
+
+

@@ -11,17 +11,17 @@ module "tags" {
 }
 
 module "api" {
-    source = "../../../terraform-modules/azure/api-gateway"
+  source = "../../../terraform-modules/azure/api-gateway"
 
-    name = var.name
-    resource_group =  var.resource_group
-    
-    publisher_email = var.publisher_email
-    publisher_name = var.publisher_name
+  name           = var.name
+  resource_group = var.resource_group
 
-    sku = var.sku
-    sku_count = var.sku_count
+  publisher_email = var.publisher_email
+  publisher_name  = var.publisher_name
 
-    tags = module.tags.tags
+  sku       = var.sku
+  sku_count = var.sku_count
+
+  tags = module.tags.tags
 }
 

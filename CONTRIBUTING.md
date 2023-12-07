@@ -18,6 +18,11 @@ To contribute, follow these steps:
 2. **CI/CD:** A feature branch pipeline will run to test your changes - **ONLY MERGE YOUR FEATURE BRANCH IF THE CI PIPELINE IS PASSING**
 3. **CHANGELOG:** You must follow the format of the changelog and update it with a description of your feature before merging to `dev`
 
+## CI/CD Workflow
+
+### Terraform Modules
+![Terraform Modules CI](./doc/devops_tf_modules_ci_workflow.svg)
+
 ### Coding Conventions
 - Write clear, readable, and consistent code.
 - Adhere to the existing coding style.

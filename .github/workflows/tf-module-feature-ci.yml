@@ -147,3 +147,37 @@ jobs:
             echo "Running Checkov on directory: $dir"
             checkov -d $dir --download-external-modules true || true
           done
+
+  # Generates Terraform Module README.mds
+  generate-docs:
+    name: Generate Terraform Docs
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform Docs
+        run: |
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/bin/terraform-docs 
+
+      - name: Update Module READMEs
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          for dir in $changed_dirs; do
+            rm -fv $dir/README.md # Remove old README.md
+            terraform-docs markdown table --output-file README.md --output-mode inject $dir
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add .
+          git commit -m "Automated: Update Terraform documentation" -a || echo "No changes to commit"
+          git push             

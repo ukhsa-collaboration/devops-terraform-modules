@@ -38,12 +38,13 @@ jobs:
           curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
-          sudo mv terraform-docs /usr/local/terraform-docs 
+          sudo mv terraform-docs /usr/local/bin/terraform-docs 
 
       - name: Update Module READMEs
         run: |
           changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
           for dir in $changed_dirs; do
+            rm -fv $dir/README.md # Remove old README.md
             terraform-docs markdown table --output-file README.md --output-mode inject $dir
           done
 

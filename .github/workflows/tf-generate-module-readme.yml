@@ -1,0 +1,56 @@
+name: Generate Terraform Documentation
+
+on:
+  workflow_dispatch:
+
+jobs:
+  pre-build:
+    name: Pre-build
+    runs-on: ubuntu-latest
+    outputs:
+      tf_module_dirs: ${{ steps.get_tf_module_dirs.outputs.tf_module_directories }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get Terraform Module Dirs
+        id: get_tf_module_dirs
+        run: |
+          root_dir="terraform-modules"
+          module_dirs=$(find "$root_dir" -name '*.tf' -print | awk -F/ '{OFS="/"; $NF=""; print $0}' | sort -u | xargs)
+          echo "Module Directories: $module_dirs"
+          echo "::set-output name=tf_module_directories::$module_dirs"
+
+  generate-docs:
+    name: Generate Terraform Docs
+    needs: pre-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Terraform Docs
+        run: |
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+          tar -xzf terraform-docs.tar.gz
+          chmod +x terraform-docs
+          sudo mv terraform-docs /usr/local/terraform-docs 
+
+      - name: Update Module READMEs
+        run: |
+          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          for dir in $changed_dirs; do
+            terraform-docs markdown table --output-file README.md --output-mode inject $dir
+          done
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add .
+          git commit -m "Automated: Update Terraform documentation" -a || echo "No changes to commit"
+          git push

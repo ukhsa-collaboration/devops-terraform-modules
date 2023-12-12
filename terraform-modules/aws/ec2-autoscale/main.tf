@@ -100,6 +100,11 @@ resource "aws_security_group" "security_group" {
 ##########################
 #          IAM           #
 ##########################
+resource "aws_iam_instance_profile" "ssm_instance_profile" {
+  name = "${module.resource_name_prefix.resource_name}-ec2-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+}
+
 resource "aws_iam_role" "ssm_role" {
   name = "${module.resource_name_prefix.resource_name}-ec2-ssm-role"
 

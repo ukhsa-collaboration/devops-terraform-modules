@@ -1,85 +1,55 @@
-# Terraform EC2 AutoScale Module
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-This Terraform module provides functionalities to manage AWS EC2 AutoScaling Group, Launch Template, and associated Security Group.
+No requirements.
 
-## Prerequisites
+## Providers
 
-- **Terraform Tags Module:** Before using the `ec2-autoscale` module, you must integrate the [Terraform Tags Module](../helpers/tags) to ensure consistent tagging across AWS resources. Refer to its documentation to understand its setup and usage.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
-## Features
+## Modules
 
-- Automated naming configuration for resources based on project and environment tags.
-- Configurable Launch Template for EC2 instances.
-- Configurable Security Group rules for the associated EC2 instances.
-- AutoScaling Group management, with the ability to specify subnets and target groups.
-- Provides outputs for generated resource names and IDs for easy referencing.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_resource_name_prefix"></a> [resource\_name\_prefix](#module\_resource\_name\_prefix) | git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix | TF/helpers/resource-name-prefix/vALPHA_0.0.2 |
 
-## Usage
+## Resources
 
-```hcl
-module "tags" {
-  source          = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.1"
+| Name | Type |
+|------|------|
+| [aws_autoscaling_group.ec2_asg](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
+| [aws_iam_role.ssm_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.ssm_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_launch_template.ec2_lt](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/launch_template) | resource |
+| [aws_security_group.security_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group) | resource |
 
-  project         = "MyProject"
-  client          = "ClientName"
-  owner           = "OwnerName"
-  environment     = "prod"
-  additional_tags = {
-    "CostCenter" = "IT-Dept"
-  }
-}
-
-module "ec2_autoscale" {
-  source                = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/ec2-autoscale?ref=ec2-autoscale/vALPHA_0.0.1"
-
-  name                  = "MyProjectName"
-  ami                   = "ami-0123456789abcdef0"
-  instance_type         = "t2.micro"
-  vpc_id                = "vpc-01234567"
-  vpc_zone_identifiers  = ["subnet-0123456a", "subnet-0123456b"]
-  
-  # Example with SSH Access
-  ingress_rules = [
-    {
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  ]
-
-  tags                  = module.tags.tags
-}
-
-# Referencing outputs from the module
-output "asg_name" {
-  value = module.ec2_autoscale.autoscaling_group_name
-}
-```
 ## Inputs
 
-| Name                  | Description                                             | Type                                                                                              | Default            | Required |
-|-----------------------|---------------------------------------------------------|---------------------------------------------------------------------------------------------------|--------------------|----------|
-| `name`                | The name of the project                                 | `string`                                                                                          | n/a                | yes      |
-| `ami`                 | AMI for the EC2 instance                                | `string`                                                                                          | n/a                | yes      |
-| `instance_type`       | Type of the EC2 instance                                | `string`                                                                                          | n/a                | yes      |
-| `user_data`           | User data for EC2 instance                              | `string`                                                                                          | `null`             | no       |
-| `vpc_id`              | VPC ID for the security group                           | `string`                                                                                          | n/a                | yes      |
-| `ingress_rules`       | List of ingress rules for the security group            | `list<rule>`                                                                                      | See defaults       | no       |
-| `egress_rules`        | List of egress rules for the security group             | `list<rule>`                                                                                      | See defaults       | no       |
-| `min_size`            | Minimum size of the Auto Scaling Group                  | `number`                                                                                          | `1`                | no       |
-| `max_size`            | Maximum size of the Auto Scaling Group                  | `number`                                                                                          | `1`                | no       |
-| `desired_capacity`    | Desired capacity of the Auto Scaling Group              | `number`                                                                                          | `1`                | no       |
-| `vpc_zone_identifiers`| Subnets for the Auto Scaling Group                      | `list(string)`                                                                                    | n/a                | yes      |
-| `target_group_arns`   | Target group ARNs for the Auto Scaling Group            | `list(string)`                                                                                    | `[]`               | no       |
-| `tags`                | Tags to assign                                          | `map(string)`                                                                                     | n/a                | yes      |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_ami"></a> [ami](#input\_ami) | AMI for the EC2 instance | `string` | n/a | yes |
+| <a name="input_desired_capacity"></a> [desired\_capacity](#input\_desired\_capacity) | Desired capacity of the Auto Scaling Group | `number` | `1` | no |
+| <a name="input_egress_rules"></a> [egress\_rules](#input\_egress\_rules) | List of egress rules for the security group | <pre>list(object({<br>    from_port   = number<br>    to_port     = number<br>    protocol    = string<br>    cidr_blocks = list(string)<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "to_port": 0<br>  }<br>]</pre> | no |
+| <a name="input_ingress_rules"></a> [ingress\_rules](#input\_ingress\_rules) | List of ingress rules for the security group | <pre>list(object({<br>    from_port   = number<br>    to_port     = number<br>    protocol    = string<br>    cidr_blocks = list(string)<br>  }))</pre> | <pre>[<br>  {<br>    "cidr_blocks": [<br>      "0.0.0.0/0"<br>    ],<br>    "from_port": 8000,<br>    "protocol": "tcp",<br>    "to_port": 8000<br>  }<br>]</pre> | no |
+| <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | Type of the EC2 instance | `string` | n/a | yes |
+| <a name="input_max_size"></a> [max\_size](#input\_max\_size) | Maximum size of the Auto Scaling Group | `number` | `1` | no |
+| <a name="input_min_size"></a> [min\_size](#input\_min\_size) | Minimum size of the Auto Scaling Group | `number` | `1` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name of the resources | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign | `map(string)` | n/a | yes |
+| <a name="input_target_group_arns"></a> [target\_group\_arns](#input\_target\_group\_arns) | Target group ARNs for the Auto Scaling Group | `list(string)` | `[]` | no |
+| <a name="input_user_data"></a> [user\_data](#input\_user\_data) | User data for EC2 instance | `string` | `null` | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID for the security group | `string` | n/a | yes |
+| <a name="input_vpc_zone_identifiers"></a> [vpc\_zone\_identifiers](#input\_vpc\_zone\_identifiers) | Subnets for the Auto Scaling Group | `list(string)` | n/a | yes |
 
 ## Outputs
 
-| Name                       | Description                             |
-|----------------------------|-----------------------------------------|
-| `name`                     | Generated name from local configuration |
-| `launch_template_name`     | The name of the launch template         |
-| `autoscaling_group_name`   | The name of the auto scaling group      |
-| `security_group_id`        | The ID of the security group            |
-| `security_group_name`      | The name of the security group          |
+| Name | Description |
+|------|-------------|
+| <a name="output_autoscaling_group_name"></a> [autoscaling\_group\_name](#output\_autoscaling\_group\_name) | The name of the auto scaling group. |
+| <a name="output_launch_template_name"></a> [launch\_template\_name](#output\_launch\_template\_name) | The name of the launch template. |
+| <a name="output_name"></a> [name](#output\_name) | Generated name from local configuration. |
+| <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | The ID of the security group. |
+| <a name="output_security_group_name"></a> [security\_group\_name](#output\_security\_group\_name) | The name of the security group. |
+<!-- END_TF_DOCS -->

@@ -82,7 +82,7 @@ variable "api_import_content_format" {
   type        = string
 }
 
-variable "api_import_content_value" {
+variable "api_import_content_path" {
   description = "The value for the imported content (e.g., URL or inline JSON)."
   type        = string
 }

@@ -23,16 +23,16 @@ module "api" {
   sku_count = var.sku_count
 
   // API Config
-  api_revision              = "1"
-  api_path                  = "myapi" 
-  api_protocols             = ["https"]
+  api_revision  = "1"
+  api_path      = "myapi"
+  api_protocols = ["https"]
 
   # API Definition
-  api_import_content_format = "swagger-link-json" 
-  api_import_content_value  = "https://example.com/api/swagger.json"
+  api_import_content_format = "openapi+json"
+  api_import_content_path   = file("${path.root}/api-definition.json")
 
   # APP Insights
-  app_insights_type         = "web" // Replace with your Application Insights type
+  app_insights_type = "web"
 
   tags = module.tags.tags
 

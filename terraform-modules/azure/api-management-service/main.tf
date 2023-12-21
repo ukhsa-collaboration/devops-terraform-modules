@@ -38,7 +38,7 @@ resource "azurerm_api_management_api" "api" {
 
   import {
     content_format = var.api_import_content_format
-    content_value  = var.api_import_content_value
+    content_value  = var.api_import_content_path
   }
 }
 

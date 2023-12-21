@@ -30,7 +30,7 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_import_content_format"></a> [api\_import\_content\_format](#input\_api\_import\_content\_format) | The format of the imported API content (e.g., 'swagger-json'). | `string` | n/a | yes |
-| <a name="input_api_import_content_value"></a> [api\_import\_content\_value](#input\_api\_import\_content\_value) | The value for the imported content (e.g., URL or inline JSON). | `string` | n/a | yes |
+| <a name="input_api_import_content_path"></a> [api\_import\_content\_path](#input\_api\_import\_content\_path) | The value for the imported content (e.g., URL or inline JSON). | `string` | n/a | yes |
 | <a name="input_api_path"></a> [api\_path](#input\_api\_path) | The URL path for accessing the API. | `string` | n/a | yes |
 | <a name="input_api_protocols"></a> [api\_protocols](#input\_api\_protocols) | The array of protocols the API uses (e.g., ['https']). | `list(string)` | <pre>[<br>  "https"<br>]</pre> | no |
 | <a name="input_api_revision"></a> [api\_revision](#input\_api\_revision) | The revision number of the API. | `string` | `"1"` | no |

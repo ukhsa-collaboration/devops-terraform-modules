@@ -39,7 +39,7 @@ No requirements.
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | The tier of the SKU used for the application gateway. | `string` | `"Standard_v2"` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | The ID of the subnet in which to create the application gateway. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign | `map(string)` | n/a | yes |
-| <a name="input_waf_configuration"></a> [waf\_configuration](#input\_waf\_configuration) | The Web Application Firewall configuration. | <pre>object({<br>    enabled          = bool<br>    firewall_mode    = string<br>    rule_set_type    = string<br>    rule_set_version = string<br>    rules            = list(object({<br>      name = string<br>    }))<br>  })</pre> | <pre>{<br>  "enabled": false,<br>  "firewall_mode": "Detection",<br>  "rule_set_type": "OWASP",<br>  "rule_set_version": "3.0",<br>  "rules": []<br>}</pre> | no |
+| <a name="input_waf_configuration"></a> [waf\_configuration](#input\_waf\_configuration) | The Web Application Firewall configuration. | <pre>object({<br>    enabled          = bool<br>    firewall_mode    = string<br>    rule_set_type    = string<br>    rule_set_version = string<br>    rules = list(object({<br>      name = string<br>    }))<br>  })</pre> | <pre>{<br>  "enabled": false,<br>  "firewall_mode": "Detection",<br>  "rule_set_type": "OWASP",<br>  "rule_set_version": "3.0",<br>  "rules": []<br>}</pre> | no |
 
 ## Outputs
 

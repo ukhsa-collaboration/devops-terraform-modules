@@ -30,8 +30,8 @@ variable "address_prefixes" {
 variable "service_delegations" {
   description = "A list of delegation blocks for services."
   type = list(object({
-    name                      = string
-    service_delegation_name   = string
+    name                       = string
+    service_delegation_name    = string
     service_delegation_actions = list(string)
   }))
   default = []

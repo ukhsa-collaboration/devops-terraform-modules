@@ -29,7 +29,7 @@ No requirements.
 | <a name="input_address_prefixes"></a> [address\_prefixes](#input\_address\_prefixes) | The address prefixes to use for the subnet. | `list(string)` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The base name of the resources | `string` | n/a | yes |
 | <a name="input_resource_group"></a> [resource\_group](#input\_resource\_group) | The name of the resource group where resources will be created. | `string` | n/a | yes |
-| <a name="input_service_delegations"></a> [service\_delegations](#input\_service\_delegations) | A list of delegation blocks for services. | <pre>list(object({<br>    name                      = string<br>    service_delegation_name   = string<br>    service_delegation_actions = list(string)<br>  }))</pre> | `[]` | no |
+| <a name="input_service_delegations"></a> [service\_delegations](#input\_service\_delegations) | A list of delegation blocks for services. | <pre>list(object({<br>    name                       = string<br>    service_delegation_name    = string<br>    service_delegation_actions = list(string)<br>  }))</pre> | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign | `map(string)` | n/a | yes |
 | <a name="input_virtual_network_name"></a> [virtual\_network\_name](#input\_virtual\_network\_name) | The name of the virtual network to which the subnet is attached. | `string` | n/a | yes |
 

@@ -19,7 +19,7 @@ data "azurerm_resource_group" "rg" {
 #  REST API Configuration  #
 ############################
 resource "azurerm_subnet" "subnet" {
-  name                 = var.name
+  name                 = "${module.resource_name_prefix.resource_name}-subnet"
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = var.virtual_network_name
   address_prefixes     = var.address_prefixes
@@ -36,5 +36,3 @@ resource "azurerm_subnet" "subnet" {
     }
   }
 }
-
-

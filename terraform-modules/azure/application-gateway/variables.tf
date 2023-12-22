@@ -42,7 +42,7 @@ variable "subnet_id" {
 
 variable "frontend_ip_configurations" {
   description = "A list of frontend IP configurations."
-  type        = list(object({
+  type = list(object({
     name                 = string
     public_ip_address_id = optional(string)
     subnet_id            = optional(string)
@@ -52,7 +52,7 @@ variable "frontend_ip_configurations" {
 
 variable "frontend_ports" {
   description = "A list of frontend ports."
-  type        = list(object({
+  type = list(object({
     name = string
     port = number
   }))
@@ -61,7 +61,7 @@ variable "frontend_ports" {
 
 variable "http_listeners" {
   description = "A list of HTTP listeners."
-  type        = list(object({
+  type = list(object({
     name                           = string
     frontend_ip_configuration_name = string
     frontend_port_name             = string
@@ -73,7 +73,7 @@ variable "http_listeners" {
 
 variable "backend_address_pools" {
   description = "A list of backend address pools."
-  type        = list(object({
+  type = list(object({
     name = string
   }))
   default = []
@@ -110,7 +110,7 @@ variable "waf_configuration" {
     firewall_mode    = string
     rule_set_type    = string
     rule_set_version = string
-    rules            = list(object({
+    rules = list(object({
       name = string
     }))
   })

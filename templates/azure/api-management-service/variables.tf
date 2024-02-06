@@ -76,3 +76,12 @@ variable "sku_count" {
     error_message = "The sku_count must be one of the following: 1, 2."
   }
 }
+variable "api_import_content_format" {
+  description = "The format of the API content to be imported"
+  type        = string
+}
+
+variable "api_import_content_path" {
+  description = "The path to the API content to be imported"
+  type        = string
+}

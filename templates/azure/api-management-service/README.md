@@ -16,7 +16,10 @@ No providers.
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_api"></a> [api](#module\_api) | ../../../terraform-modules/azure/api-management-service | n/a |
+| <a name="module_apim_subnet"></a> [apim\_subnet](#module\_apim\_subnet) | ../../../terraform-modules/azure/subnet | n/a |
+| <a name="module_app_gw_subnet"></a> [app\_gw\_subnet](#module\_app\_gw\_subnet) | ../../../terraform-modules/azure/subnet | n/a |
 | <a name="module_tags"></a> [tags](#module\_tags) | git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags | TF/helpers/tags/vALPHA_0.0.1 |
+| <a name="module_virtual_network"></a> [virtual\_network](#module\_virtual\_network) | ../../../terraform-modules/azure/virtual-network | n/a |
 
 ## Resources
 
@@ -26,6 +29,8 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_api_import_content_format"></a> [api\_import\_content\_format](#input\_api\_import\_content\_format) | The format of the API content to be imported | `string` | n/a | yes |
+| <a name="input_api_import_content_path"></a> [api\_import\_content\_path](#input\_api\_import\_content\_path) | The path to the API content to be imported | `string` | n/a | yes |
 | <a name="input_client"></a> [client](#input\_client) | Client to which the resource is associated | `string` | n/a | yes |
 | <a name="input_environment"></a> [environment](#input\_environment) | The environment for this deployment (e.g., dev, prod) | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | The name of the resources | `string` | n/a | yes |

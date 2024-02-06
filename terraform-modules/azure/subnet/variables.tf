@@ -37,6 +37,12 @@ variable "service_delegations" {
   default = []
 }
 
+variable "service_endpoints" {
+  description = "List of service endpoints to associate with the subnet"
+  type        = list(string)
+  default     = []
+}
+
 ########################
 #      Tags Config     #
 ########################

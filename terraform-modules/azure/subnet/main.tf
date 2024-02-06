@@ -23,6 +23,7 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = data.azurerm_resource_group.rg.name
   virtual_network_name = var.virtual_network_name
   address_prefixes     = var.address_prefixes
+  service_endpoints    = var.service_endpoints
 
   dynamic "delegation" {
     for_each = var.service_delegations

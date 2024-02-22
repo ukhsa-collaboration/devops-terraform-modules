@@ -17,6 +17,7 @@
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_resource_name_prefix"></a> [resource\_name\_prefix](#module\_resource\_name\_prefix) | git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix | TF/helpers/resource-name-prefix/vALPHA_0.0.2 |
+| <a name="module_tags"></a> [tags](#module\_tags) | git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags | TF/helpers/tags/vALPHA_0.0.6 |
 
 ## Resources
 
@@ -56,8 +57,8 @@
 | <a name="input_log_analytics_workspace_retention_in_days"></a> [log\_analytics\_workspace\_retention\_in\_days](#input\_log\_analytics\_workspace\_retention\_in\_days) | (Optional) The workspace data retention in days. Possible values are either 7 (Free Tier only) or range between 30 and 730. | `number` | `null` | no |
 | <a name="input_log_analytics_workspace_sku"></a> [log\_analytics\_workspace\_sku](#input\_log\_analytics\_workspace\_sku) | (Optional) Specifies the SKU of the Log Analytics Workspace. Possible values are 'Free', 'PerNode', 'Premium', 'Standard', 'Standalone', 'Unlimited', 'CapacityReservation', and 'PerGB2018'(new SKU as of '2018-04-03'). Defaults to 'PerGB2018'. | `string` | `"PerGB2018"` | no |
 | <a name="input_log_analytics_workspace_tags"></a> [log\_analytics\_workspace\_tags](#input\_log\_analytics\_workspace\_tags) | (Optional) A mapping of tags to assign to the resource. | `map(string)` | `null` | no |
-| <a name="input_name"></a> [name](#input\_name) | (Required) The base name of the resources | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | (Required) The name of the resource group in which the resources will be created. | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | (Required) Tags to be assigned to the resources, must include project, client, owner and environment keys | <pre>object({<br>    project         = string<br>    client          = string<br>    owner           = string<br>    environment     = string<br>    additional_tags = optional(map(string))<br>  })</pre> | n/a | yes |
 
 ## Outputs
 

@@ -43,7 +43,7 @@ resource "azurerm_container_app_environment" "container_env" {
   resource_group_name            = data.azurerm_resource_group.rg.name
   infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
-  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
+  log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.law[0].id, var.log_analytics_workspace.id)
   tags                           = merge(var.container_app_environment_tags, module.tags.tags)
 
   lifecycle {

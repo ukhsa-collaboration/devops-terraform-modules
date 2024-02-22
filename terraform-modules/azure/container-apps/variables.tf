@@ -1,9 +1,15 @@
 ########################
 #    Resource Naming   #
 ########################
-variable "name" {
-  description = "(Required) The base name of the resources"
-  type        = string
+variable "tags" {
+  description = "(Required) Tags to be assigned to the resources, must include project, client, owner and environment keys"
+  type        = object({
+    project         = string
+    client          = string
+    owner           = string
+    environment     = string
+    additional_tags = optional(map(string))
+  })
   nullable    = false
 }
 

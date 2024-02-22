@@ -1,11 +1,21 @@
-##########################
-#     Naming Config      #
-##########################
+######################################
+#     Naming and tagging Config      #
+######################################
+module "tags" {
+  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.6"
+
+  project         = var.tags.project
+  client          = var.tags.client
+  owner           = var.tags.owner
+  environment     = var.tags.environment
+  additional_tags = var.tags.additional_tags != null ? var.tags.additional_tags : {}
+}
+
 module "resource_name_prefix" {
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix?ref=TF/helpers/resource-name-prefix/vALPHA_0.0.2"
 
-  name = var.name
-  tags = var.tags
+  name = module.tags.tags.project
+  tags = module.tags.tags
 }
 
 ##########################
@@ -34,7 +44,7 @@ resource "azurerm_container_app_environment" "container_env" {
   infrastructure_subnet_id       = var.container_app_environment_infrastructure_subnet_id
   internal_load_balancer_enabled = var.container_app_environment_internal_load_balancer_enabled
   log_analytics_workspace_id     = try(azurerm_log_analytics_workspace.laws[0].id, var.log_analytics_workspace.id)
-  tags                           = var.container_app_environment_tags
+  tags                           = merge(var.container_app_environment_tags, module.tags.tags)
 
   lifecycle {
     precondition {

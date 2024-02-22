@@ -106,7 +106,7 @@ resource "azurerm_container_app" "container_app" {
   container_app_environment_id = local.container_app_environment_id
   resource_group_name          = data.azurerm_resource_group.rg.name
   revision_mode                = each.value.revision_mode
-  tags                         = each.value.tags
+  tags                         = merge(each.value.tags, module.tags.tags)
   workload_profile_name        = each.value.workload_profile_name
 
   template {
@@ -348,5 +348,5 @@ resource "azurerm_log_analytics_workspace" "law" {
   reservation_capacity_in_gb_per_day = var.log_analytics_workspace_reservation_capacity_in_gb_per_day
   retention_in_days                  = var.log_analytics_workspace_retention_in_days
   sku                                = var.log_analytics_workspace_sku
-  tags                               = var.log_analytics_workspace_tags
+  tags                               = merge(var.log_analytics_workspace_tags, module.tags.tags)
 }

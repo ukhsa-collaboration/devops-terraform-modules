@@ -3,14 +3,14 @@
 ########################
 variable "tags" {
   description = "(Required) Tags to be assigned to the resources, must include project, client, owner and environment keys"
-  type        = object({
+  type = object({
     project         = string
     client          = string
     owner           = string
     environment     = string
     additional_tags = optional(map(string))
   })
-  nullable    = false
+  nullable = false
 }
 
 ##########################

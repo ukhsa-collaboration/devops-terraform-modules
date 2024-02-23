@@ -20,6 +20,10 @@ resource "aws_launch_template" "ec2_lt" {
 
   user_data = base64encode(var.user_data)
 
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ssm_instance_profile.arn
+  }
+
   tag_specifications {
     resource_type = "network-interface"
     tags          = merge(var.tags, { "Name" = "${module.resource_name_prefix.resource_name}-ec2-ni" })
@@ -91,4 +95,34 @@ resource "aws_security_group" "security_group" {
   }
 
   tags = var.tags
+}
+
+##########################
+#          IAM           #
+##########################
+resource "aws_iam_instance_profile" "ssm_instance_profile" {
+  name = "${module.resource_name_prefix.resource_name}-ec2-ssm-profile"
+  role = aws_iam_role.ssm_role.name
+}
+
+resource "aws_iam_role" "ssm_role" {
+  name = "${module.resource_name_prefix.resource_name}-ec2-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
 }

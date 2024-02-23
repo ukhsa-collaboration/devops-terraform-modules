@@ -14,9 +14,9 @@ variable "resource_group" {
   type        = string
 }
 
-############################
-#  REST API Configuration  #
-############################
+##########################
+# API Management Service #
+##########################
 variable "publisher_email" {
   default     = "test@contoso.com"
   description = "The email address of the owner of the service"
@@ -55,6 +55,45 @@ variable "sku_count" {
     condition     = contains([1, 2], var.sku_count)
     error_message = "The sku_count must be one of the following: 1, 2."
   }
+}
+
+##########################
+# API Configuration      #
+##########################
+variable "api_revision" {
+  description = "The revision number of the API."
+  default     = "1"
+  type        = string
+}
+
+variable "api_path" {
+  description = "The URL path for accessing the API."
+  type        = string
+}
+
+variable "api_protocols" {
+  description = "The array of protocols the API uses (e.g., ['https'])."
+  type        = list(string)
+  default     = ["https"]
+}
+
+variable "api_import_content_format" {
+  description = "The format of the imported API content (e.g., 'swagger-json')."
+  type        = string
+}
+
+variable "api_import_content_path" {
+  description = "The value for the imported content (e.g., URL or inline JSON)."
+  type        = string
+}
+
+##########################
+# Application Insights   #
+##########################
+variable "app_insights_type" {
+  description = "The type of Application Insights (e.g., 'web')."
+  default     = "web"
+  type        = string
 }
 
 ########################

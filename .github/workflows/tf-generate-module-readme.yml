@@ -39,6 +39,7 @@ jobs:
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/terraform-docs 
+          rm -rfv terraform-docs.tar.gz
 
       - name: Update Module READMEs
         run: |

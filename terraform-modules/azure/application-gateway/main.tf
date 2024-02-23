@@ -91,19 +91,20 @@ resource "azurerm_application_gateway" "app_gw" {
     }
   }
 
-  waf_configuration {
-    enabled          = var.waf_configuration["enabled"]
-    firewall_mode    = var.waf_configuration["firewall_mode"]
-    rule_set_type    = var.waf_configuration["rule_set_type"]
-    rule_set_version = var.waf_configuration["rule_set_version"]
+  # TODO: Update broken WAF configuration
+  # waf_configuration {
+  #   enabled          = var.waf_configuration["enabled"]
+  #   firewall_mode    = var.waf_configuration["firewall_mode"]
+  #   rule_set_type    = var.waf_configuration["rule_set_type"]
+  #   rule_set_version = var.waf_configuration["rule_set_version"]
 
-    dynamic "rule" {
-      for_each = var.waf_configuration["rules"]
-      content {
-        name = rule.value.name
-      }
-    }
-  }
+  #   dynamic "rule" {
+  #     for_each = var.waf_configuration["rules"]
+  #     content {
+  #       name = rule.value.name
+  #     }
+  #   }
+  # }
 
   tags = var.tags
 }

@@ -26,22 +26,22 @@ variable "resource_group_name" {
 #     Azure API Management Configuration     #
 ##############################################
 variable "publisher_name" {
-  description = "Name of the publisher for the API Management service"
+  description = "(Required) Name of the publisher for the API Management service"
   type        = string
 }
 
 variable "publisher_email" {
-  description = "Email of the publisher for the API Management service"
+  description = "(Required) Email of the publisher for the API Management service"
   type        = string
 }
 
 variable "sku_name" {
-  description = "sku_name is a string consisting of two parts separated by an underscore(_). The first part is the name, valid values include: Consumption, Developer, Basic, Standard and Premium. The second part is the capacity (e.g. the number of deployed units of the sku), which must be a positive integer (e.g. Developer_1)."
+  description = "(Required) sku_name is a string consisting of two parts separated by an underscore(_). The first part is the name, valid values include: Consumption, Developer, Basic, Standard and Premium. The second part is the capacity (e.g. the number of deployed units of the sku), which must be a positive integer (e.g. Developer_1)."
   type        = string
 }
 
 variable "public_network_access_enabled" {
-  description = "Is public access to the service allowed? Defaults to true."
+  description = "(Optional) Is public access to the service allowed? Defaults to true."
   type        = bool
 }
 
@@ -83,7 +83,7 @@ variable "apis" {
 #     Azure Application Insights     #
 ######################################
 variable "application_insights_type" {
-  description = "Type of the Application Insights resource"
+  description = "(Optional) Type of the Application Insights resource"
   type        = string
   default     = "other"
 }
@@ -92,6 +92,6 @@ variable "application_insights_type" {
 #     Azure Networking     #
 ############################
 variable "subnet_id" {
-  description = "The id of the subnet that will be used for the API Management."
+  description = "(Required) The id of the subnet that will be used for the API Management."
   type        = string
 }

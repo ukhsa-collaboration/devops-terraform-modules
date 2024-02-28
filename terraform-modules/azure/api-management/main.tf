@@ -1,5 +1,3 @@
-# Test Comment to be removed.
-
 ######################################
 #     Naming and tagging Config      #
 ######################################
@@ -78,7 +76,7 @@ resource "azurerm_api_management_logger" "logger" {
   resource_group_name = data.azurerm_resource_group.resource_group.name
 
   application_insights {
-    instrumentation_key = azurerm_application_insights.app_insights.instrumentation_key
+    instrumentation_key = azurerm_application_insights.application_insights.instrumentation_key
   }
 
   depends_on = [

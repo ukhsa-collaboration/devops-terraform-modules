@@ -49,7 +49,9 @@ jobs:
           for file in "${ADDR[@]}"; do
             dir=$(dirname "$file")
             if [[ ! " $changed_dirs " =~ " $dir " ]]; then
-              changed_dirs+="$dir "
+              if [ -d "$dir" ]; then
+                changed_dirs+="$dir "
+              fi
             fi
           done
           changed_dirs=$(echo $changed_dirs | xargs)  # Trim extra spaces

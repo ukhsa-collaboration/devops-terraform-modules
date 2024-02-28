@@ -74,7 +74,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ github.event.inputs.terraform_version }}
+          terraform_version: ${{ inputs.terraform_version }}
 
       # - name: Setup SSH Key
       #   run: |
@@ -127,7 +127,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ github.event.inputs.terraform_version }}
+          terraform_version: ${{ inputs.terraform_version }}
 
       # - name: Setup SSH Key
       #   run: |
@@ -139,10 +139,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ github.event.inputs.python_version }}
+          python-version: ${{ inputs.python_version }}
 
       - name: Install Checkov
-        run: pip install "checkov==${{ github.event.inputs.checkov_version }}"
+        run: pip install "checkov==${{ inputs.checkov_version }}"
 
       - name: Run Checkov
         run: |
@@ -165,7 +165,7 @@ jobs:
 
       - name: Setup Terraform docs
         run: |
-          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ github.event.inputs.terraform_docs_version }}/terraform-docs-${{ github.event.inputs.terraform_docs_version }}-$(uname)-amd64.tar.gz
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ inputs.terraform_docs_version }}/terraform-docs-${{ inputs.terraform_docs_version }}-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/terraform-docs 

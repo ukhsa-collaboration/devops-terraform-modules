@@ -1,29 +1,17 @@
 name: Terraform module feature
 
 on:
-  workflow_dispatch:
-    inputs:
-      terraform_version:
-        description: 'The Terraform version for the Github Action'
-        required: true
-        default: '1.7.4'
-      terraform_docs_version:
-        description: 'The Terraform docs version for the Github Action'
-        required: true
-        default: 'v0.17.0'
-      python_version:
-        description: 'The version of Python used for Checkov'
-        required: true
-        default: '3.10'
-      checkov_version:
-        description: 'The version of Checkov for the Github Action'
-        required: true
-        default: '3.2.26'
   push:
     branches:
       - feature/*
     paths:
       - 'terraform-modules/**/*.tf'
+
+env:
+  TERRAFORM_VERSION: "1.7.4"
+  TERRAFORM_DOCS_VERSION: "v0.17.0"
+  PYTHON_VERSION: "3.12"
+  CHECKOV_VERSION: "3.2.26"
 
 jobs:
   pre-build:
@@ -74,7 +62,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ inputs.terraform_version }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       # - name: Setup SSH Key
       #   run: |
@@ -127,7 +115,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: ${{ inputs.terraform_version }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       # - name: Setup SSH Key
       #   run: |
@@ -139,10 +127,10 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ inputs.python_version }}
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Checkov
-        run: pip install "checkov==${{ inputs.checkov_version }}"
+        run: pip install "checkov==${{ env.CHECKOV_VERSION }}"
 
       - name: Run Checkov
         run: |
@@ -165,7 +153,7 @@ jobs:
 
       - name: Setup Terraform docs
         run: |
-          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ inputs.terraform_docs_version }}/terraform-docs-${{ inputs.terraform_docs_version }}-$(uname)-amd64.tar.gz
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/terraform-docs 

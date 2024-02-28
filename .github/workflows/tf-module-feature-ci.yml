@@ -64,12 +64,12 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      # - name: Setup SSH Key
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
       - name: Terraform initialize
         run: |
@@ -103,7 +103,7 @@ jobs:
       #     done
 
   terraform-security-scan:
-    name: Terraform Security Scan
+    name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
@@ -117,12 +117,12 @@ jobs:
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      # - name: Setup SSH Key
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts 
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -140,13 +140,13 @@ jobs:
             checkov -d $dir --download-external-modules true || true
           done
 
-  # Generates Terraform Module README.mds
+  # Generates Terraform module README.mds
   generate-docs:
     name: Generate Terraform docs
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -159,7 +159,7 @@ jobs:
           sudo mv terraform-docs /usr/local/bin/terraform-docs 
           rm -rfv terraform-docs.tar.gz
 
-      - name: Update Module READMEs
+      - name: Update module READMEs
         run: |
           changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
@@ -167,7 +167,7 @@ jobs:
             terraform-docs markdown table --output-file README.md --output-mode inject $dir
           done
 
-      - name: Commit and Push Changes
+      - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'

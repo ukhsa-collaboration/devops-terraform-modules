@@ -1,11 +1,17 @@
-name: TF Module Feature CI
+name: "Terraform module: feature"
 
 on:
   push:
     branches:
       - feature/*
     paths:
-    - 'terraform-modules/**/*.tf'
+      - 'terraform-modules/**/*.tf'
+
+env:
+  TERRAFORM_VERSION: "1.7.4"
+  TERRAFORM_DOCS_VERSION: "v0.17.0"
+  PYTHON_VERSION: "3.12"
+  CHECKOV_VERSION: "3.2.26"
 
 jobs:
   pre-build:
@@ -13,82 +19,66 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
-      changed_directories: ${{ steps.process_files_changes.outputs.changed_tf_dirs }}
+      changed_directories: ${{ steps.identify_changed_folders.outputs.changed_tf_dirs }}
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check Event Type
+      - name: Check event type
         id: check_event
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "::set-output name=is_pr::true"
+            echo "is_pr=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=is_pr::false"
+            echo "is_pr=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Identify Changed Terraform Files from Dev Branch
-        id: identify_changed_files
+      - name: Identify changed Terraform folders from 'dev' branch
+        id: identify_changed_folders
         run: |
-          changed_files=$(git diff --name-only origin/dev HEAD | grep '\.tf$')
-          changed_files=$(echo $changed_files | tr '\n' ' ')
-          echo "Changed Terraform files: $changed_files"
-          echo "::set-output name=changed_tf_files::$changed_files"
-
-      - name: Process Changed Files from Dev Branch
-        id: process_files_changes
-        run: |
-          # Get the list of changed files
-          changed_files="${{ steps.identify_changed_files.outputs.changed_tf_files }}"
-          
-          # Extract unique directory names from the file paths
-          IFS=' ' read -ra ADDR <<< "$changed_files"
+          changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
           changed_dirs=""
-          for file in "${ADDR[@]}"; do
-            dir=$(dirname "$file")
-            if [[ ! " $changed_dirs " =~ " $dir " ]]; then
+          for file in $changed_files; do
+              dir=$(dirname "$file")
               if [ -d "$dir" ]; then
-                changed_dirs+="$dir "
+                  changed_dirs+=$dir$'\n'
               fi
-            fi
           done
-          changed_dirs=$(echo $changed_dirs | xargs)  # Trim extra spaces
-          
           echo "Directories with changes: $changed_dirs"
-          echo "::set-output name=changed_tf_dirs::$changed_dirs"
+          echo "changed_tf_dirs=$changed_dirs" >> $GITHUB_OUTPUT
 
   terraform-lint-and-validate:
-    name: Terraform Lint and Validation
+    name: Terraform lint and validation
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.6
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
-      - name: Terraform Initialize
+      - name: Terraform initialize
         run: |
           changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
             (cd $dir && terraform init)
           done
 
-      - name: Check Terraform Format
+      - name: Check Terraform format
         run: |
           changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
@@ -113,21 +103,21 @@ jobs:
       #     done
 
   terraform-security-scan:
-    name: Terraform Security Scan
+    name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.6
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -135,12 +125,12 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Checkov
-        run: pip install checkov
+        run: pip install "checkov==${{ env.CHECKOV_VERSION }}"
 
       - name: Run Checkov
         run: |
@@ -150,26 +140,26 @@ jobs:
             checkov -d $dir --download-external-modules true || true
           done
 
-  # Generates Terraform Module README.mds
+  # Generates Terraform module README.mds
   generate-docs:
-    name: Generate Terraform Docs
+    name: Generate Terraform docs
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Terraform Docs
+      - name: Setup Terraform docs
         run: |
-          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.16.0/terraform-docs-v0.16.0-$(uname)-amd64.tar.gz
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/terraform-docs 
           rm -rfv terraform-docs.tar.gz
 
-      - name: Update Module READMEs
+      - name: Update module READMEs
         run: |
           changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
@@ -177,10 +167,10 @@ jobs:
             terraform-docs markdown table --output-file README.md --output-mode inject $dir
           done
 
-      - name: Commit and Push Changes
+      - name: Commit and push changes
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
           git commit -m "Automated: Update Terraform documentation" -a || echo "No changes to commit"
-          git push             
+          git push

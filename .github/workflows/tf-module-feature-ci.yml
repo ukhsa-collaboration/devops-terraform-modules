@@ -39,15 +39,15 @@ jobs:
         id: identify_changed_folders
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
-          changed_dirs=""
-          for file in $changed_files; do
+          changed_dirs=()
+          for file in "${changed_files[@]}"; do
               dir=$(dirname "$file")
               if [ -d "$dir" ]; then
-                  changed_dirs+=$dir$'\n'
+                  changed_dirs+=($dir)
               fi
           done
-          echo "Directories with changes: $changed_dirs"
-          echo "changed_tf_dirs=$changed_dirs" >> $GITHUB_OUTPUT
+          echo "Directories with changes: ${changed_dirs[@]}"
+          echo "changed_tf_dirs=(${changed_dirs[@]})" >> $GITHUB_OUTPUT
 
   terraform-lint-and-validate:
     name: Terraform lint and validation

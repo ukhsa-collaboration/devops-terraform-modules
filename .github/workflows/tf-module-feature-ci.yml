@@ -1,4 +1,4 @@
-name: Terraform module feature
+name: "Terraform module: feature"
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
       changed_directories: ${{ steps.identify_changed_folders.outputs.changed_tf_dirs }}
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -54,7 +54,7 @@ jobs:
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -107,7 +107,7 @@ jobs:
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0

@@ -44,9 +44,9 @@ jobs:
           for file in $changed_files; do
               dir=$(dirname "$file")
               echo "  - $dir"
-              # if [[ -d "$dir" ]]; then
+              if [[ -d "$dir" ]]; then
                   changed_dirs+=($dir)
-              # fi
+              fi
           done
           
           # Get unique directories

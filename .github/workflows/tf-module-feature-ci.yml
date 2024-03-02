@@ -1,4 +1,4 @@
-name: "Terraform module: feature"
+name: 'Terraform module: feature'
 
 on:
   push:
@@ -8,14 +8,14 @@ on:
       - 'terraform-modules/**/*.tf'
 
 env:
-  TERRAFORM_VERSION: "1.7.4"
-  TERRAFORM_DOCS_VERSION: "v0.17.0"
-  PYTHON_VERSION: "3.12"
-  CHECKOV_VERSION: "3.2.26"
+  TERRAFORM_VERSION: '1.7.4'
+  TERRAFORM_DOCS_VERSION: 'v0.17.0'
+  PYTHON_VERSION: '3.12'
+  CHECKOV_VERSION: '3.2.28'
 
 jobs:
   pre-build:
-    name: pre-build
+    name: Pre-build steps
     runs-on: ubuntu-latest
     outputs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
@@ -40,19 +40,26 @@ jobs:
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
           changed_dirs=()
-          for file in "${changed_files[@]}"; do
+          echo 'Getting directories with changes...'
+          for file in $changed_files; do
               dir=$(dirname "$file")
-              if [ -d "$dir" ]; then
+              echo "  - $dir"
+              # if [[ -d "$dir" ]]; then
                   changed_dirs+=($dir)
-              fi
+              # fi
           done
-          echo "Directories with changes: ${changed_dirs[@]}"
-          echo "changed_tf_dirs=(${changed_dirs[@]})" >> $GITHUB_OUTPUT
+          
+          # Get unique directories
+          IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
+          
+          echo "Existing directories with changes: ${changed_dirs[@]}"
+          echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 
   terraform-lint-and-validate:
     name: Terraform lint and validation
     needs: pre-build
     runs-on: ubuntu-latest
+    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,16 +80,17 @@ jobs:
 
       - name: Terraform initialize
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            (cd $dir && terraform init)
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Initializing Terraform in directory: $dir"
+            (cd "$dir" && terraform init)
           done
 
       - name: Check Terraform format
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            # Change to each directory and check formatting
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Checking Terraform format in directory: $dir"
             (cd "$dir" && terraform fmt -check) || {
               echo "Formatting issues found in $dir. Please run 'terraform fmt -recursive' to fix them."
               exit 1
@@ -91,14 +99,15 @@ jobs:
 
       - name: Validate Terraform
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            (cd $dir && terraform validate)
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Validating Terraform in directory: $dir"
+            (cd "$dir" && terraform validate)
           done
 
       # - name: Terraform Plan
       #   run: |
-      #     for dir in ${{ needs.pre-build.outputs.changed_directories }}; do
+      #     for dir in (${{ needs.pre-build.outputs.changed_directories }}); do
       #       cd $dir && terraform plan
       #     done
 
@@ -106,6 +115,7 @@ jobs:
     name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
+    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -134,10 +144,10 @@ jobs:
 
       - name: Run Checkov
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
             echo "Running Checkov on directory: $dir"
-            checkov -d $dir --download-external-modules true || true
+            checkov -d "$dir" --download-external-modules true
           done
 
   # Generates Terraform module README.mds
@@ -145,6 +155,7 @@ jobs:
     name: Generate Terraform docs
     needs: pre-build
     runs-on: ubuntu-latest
+    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -153,7 +164,7 @@ jobs:
 
       - name: Setup Terraform docs
         run: |
-          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz
+          curl -Lo ./terraform-docs.tar.gz "https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz"
           tar -xzf terraform-docs.tar.gz
           chmod +x terraform-docs
           sudo mv terraform-docs /usr/local/bin/terraform-docs 
@@ -161,10 +172,11 @@ jobs:
 
       - name: Update module READMEs
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            rm -fv $dir/README.md # Remove old README.md
-            terraform-docs markdown table --output-file README.md --output-mode inject $dir
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Updating README.md in directory: $dir"
+            rm -fv "$dir/README.md" # Remove old README.md
+            terraform-docs markdown table --output-file README.md --output-mode inject "$dir"
           done
 
       - name: Commit and push changes
@@ -172,5 +184,5 @@ jobs:
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add .
-          git commit -m "Automated: Update Terraform documentation" -a || echo "No changes to commit"
+          git commit -m 'Automated: Update Terraform documentation' -a || echo 'No changes to commit'
           git push

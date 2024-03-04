@@ -1,20 +1,24 @@
-name: TF Module Dev CI
+name: "Terraform module: dev"
 
 on:
   push:
     branches:
       - dev
     paths:
-    - 'terraform-modules/**/*.tf'
+      - 'terraform-modules/**/*.tf'
   pull_request:
     branches:
       - dev
     paths:
-    - 'terraform-modules/**/*.tf'
+      - 'terraform-modules/**/*.tf'
 
 env:
-    TF_MODULE_DIR: "terraform-modules" 
-    ENVIRONMENT: "dev"
+  TERRAFORM_VERSION: "1.7.4"
+  TERRAFORM_DOCS_VERSION: "v0.17.0"
+  PYTHON_VERSION: "3.12"
+  CHECKOV_VERSION: "3.2.26"
+  TF_MODULE_DIR: "terraform-modules" 
+  ENVIRONMENT: "dev"
 
 jobs:
   pre-build:
@@ -23,90 +27,75 @@ jobs:
     outputs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
       tf_module_dirs: ${{ steps.get_tf_module_dirs.outputs.tf_module_directories }}
-      changed_directories: ${{ steps.process_files_changes.outputs.changed_tf_dirs }}
+      changed_directories: ${{ steps.identify_changed_folders.outputs.changed_tf_dirs }}
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      - name: Check Event Type
+      - name: Check event type
         id: check_event
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "::set-output name=is_pr::true"
+            echo "is_pr=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=is_pr::false"
+            echo "is_pr=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Get Terraform Module Dirs
+      - name: Get all Terraform module directories
         id: get_tf_module_dirs
         run: |
-          root_dir="terraform-modules"
-          module_dirs=$(find "$root_dir" -name '*.tf' -print | awk -F/ '{OFS="/"; $NF=""; print $0}' | sort -u | xargs)
-          echo "Module Directories: $module_dirs"
-          echo "::set-output name=tf_module_directories::$module_dirs"
+          module_dirs=$(find "${{ env.TF_MODULE_DIR }}" -name '*.tf' -print | awk -F/ '{OFS="/"; $NF=""; print $0}' | sort -u | xargs)
+          echo "Module directories: $module_dirs"
+          echo "tf_module_directories=$module_dirs" >> $GITHUB_OUTPUT
 
-      - name: Identify Changed Terraform Files
-        id: identify_changed_files
+      - name: Identify changed Terraform folders from 'dev' branch
+        id: identify_changed_folders
         run: |
-          changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$')
-          changed_files=$(echo $changed_files | tr '\n' ' ')
-          echo "Changed Terraform files: $changed_files"
-          echo "::set-output name=changed_tf_files::$changed_files"
-  
-      - name: Process Changed Files
-        id: process_files_changes
-        run: |
-          # Get the list of changed files
-          changed_files="${{ steps.identify_changed_files.outputs.changed_tf_files }}"
-          
-          # Extract unique directory names from the file paths
-          IFS=' ' read -ra ADDR <<< "$changed_files"
+          changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
           changed_dirs=""
-          for file in "${ADDR[@]}"; do
-          dir=$(dirname "$file")
-          if [[ ! " $changed_dirs " =~ " $dir " ]]; then
-              changed_dirs+="$dir "
-          fi
+          for file in $changed_files; do
+              dir=$(dirname "$file")
+              if [ -d "$dir" ]; then
+                  changed_dirs+=$dir$'\n'
+              fi
           done
-          changed_dirs=$(echo $changed_dirs | xargs)  # Trim extra spaces
-          
-          echo "Changed Directories: $changed_dirs"
-          echo "::set-output name=changed_tf_dirs::$changed_dirs"
+          echo "Directories with changes: $changed_dirs"
+          echo "changed_tf_dirs=$changed_dirs" >> $GITHUB_OUTPUT
 
   terraform-lint-and-validate:
-    name: Terraform Lint and Validation
+    name: Terraform lint and validation
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.6
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
-      - name: Terraform Initialize
+      - name: Terraform initialize
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
             (cd $dir && terraform init)
           done
 
-      - name: Check Terraform Format
+      - name: Check Terraform format
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
             # Change to each directory and check formatting
             (cd "$dir" && terraform fmt -check) || {
@@ -117,7 +106,7 @@ jobs:
 
       - name: Validate Terraform
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
             (cd $dir && terraform validate)
           done
@@ -129,21 +118,21 @@ jobs:
       #     done
 
   terraform-security-scan:
-    name: Terraform Security Scan
+    name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.5.6
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
@@ -151,33 +140,33 @@ jobs:
           ssh-keyscan github.com >> ~/.ssh/known_hosts 
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Install Checkov
-        run: pip install checkov
+        run: pip install "checkov==${{ env.CHECKOV_VERSION }}"
 
       - name: Run Checkov
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.tf_module_dirs }}"
+          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
           for dir in $changed_dirs; do
             echo "Running Checkov on directory: $dir"
             checkov -d $dir --download-external-modules true || true
           done
           
   release_module:
-    name: Release Module
+    name: Release module
     needs: [ terraform-lint-and-validate, terraform-security-scan, pre-build ]
     if: ${{ needs.pre-build.outputs.is_pull_request == 'false' }}
     runs-on: ubuntu-latest   
     steps:  
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Release Module
+      - name: Release module
         run: |
           increment_version() {
             local version=$1
@@ -193,17 +182,17 @@ jobs:
               echo "${latest_tag##*/}"
           }
           
-          # Set Changed Dirs
+          # Set changed dirs
           changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
 
-          # Set Environment
+          # Set environment
           environment="${{ env.ENVIRONMENT }}"
           environment="${environment^^}"
 
-          # Process Module Version tags
+          # Process module version tags
           for dir in $changed_dirs; do
             # Replace 'terraform-modules' with 'dev/TF' in directory
-            dir=$(echo "$dir" | sed "s|terraform-modules|$environment/TF|")
+            dir=$(echo "$dir" | sed "s|${{ env.TF_MODULE_DIR }}|$environment/TF|")
 
             latest_version=$(get_latest_version $dir)
             if [ -z "$latest_version" ]; then
@@ -213,9 +202,9 @@ jobs:
                 new_version=$(increment_version $latest_version)
             fi
 
-            # Create new Tag
+            # Create new tag
             new_tag="${dir}/${new_version}"
-            echo "New Version: $new_tag"
+            echo "New version: $new_tag"
 
             # Tag Git
             git tag $new_tag && git push origin $new_tag

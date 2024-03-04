@@ -18,7 +18,7 @@ env:
   PYTHON_VERSION: "3.12"
   CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 
-  ENVIRONMENT: "prod"
+  ENVIRONMENT: "dev"
 
 jobs:
   pre-build:
@@ -106,7 +106,7 @@ jobs:
 
           # Process module version tags
           for dir in "${changed_dirs[@]}"; do
-            # Replace modules directory with 'dev/TF'
+            # Replace modules directory with 'prod/TF'
             dir=$(echo "$dir" | sed "s|${{ env.TF_MODULE_DIR }}|$environment/TF|")
 
             latest_version=$(get_latest_version "$dir")

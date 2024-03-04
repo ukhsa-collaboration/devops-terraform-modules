@@ -82,8 +82,11 @@ jobs:
         run: |
           changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
           for dir in "${changed_dirs[@]}"; do
-            echo "Initializing Terraform in directory: $dir"
-            (cd "$dir" && terraform init)
+            echo "Initialising Terraform in directory: $dir"
+            (cd "$dir" && terraform init) || {
+              echo "Failed to initialise: $dir. Please check 'terraform init' runs."
+              exit 1
+            }
           done
 
       - name: Check Terraform format

@@ -35,7 +35,7 @@ jobs:
             echo "is_pr=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Identify changed Terraform folders from 'dev' branch
+      - name: Identify changed Terraform folders from 'feature' branch
         id: identify_changed_folders
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
@@ -48,10 +48,10 @@ jobs:
                   changed_dirs+=($dir)
               fi
           done
-          
+
           # Get unique directories
           IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
-          
+
           echo "Existing directories with changes: ${changed_dirs[@]}"
           echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 

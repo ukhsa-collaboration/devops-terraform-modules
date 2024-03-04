@@ -16,13 +16,13 @@ env:
   TERRAFORM_VERSION: "1.7.4"
   TERRAFORM_DOCS_VERSION: "v0.17.0"
   PYTHON_VERSION: "3.12"
-  CHECKOV_VERSION: "3.2.26"
+  CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 
-  ENVIRONMENT: "dev"
+  ENVIRONMENT: "prod"
 
 jobs:
   pre-build:
-    name: pre-build
+    name: Pre-build steps
     runs-on: ubuntu-latest
     outputs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
@@ -50,19 +50,25 @@ jobs:
           echo "Module directories: $module_dirs"
           echo "tf_module_directories=$module_dirs" >> $GITHUB_OUTPUT
 
-      - name: Identify changed Terraform folders from 'dev' branch
+      - name: Identify changed Terraform folders from 'prod' branch
         id: identify_changed_folders
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
-          changed_dirs=""
+          changed_dirs=()
+          echo 'Getting directories with changes...'
           for file in $changed_files; do
               dir=$(dirname "$file")
-              if [ -d "$dir" ]; then
-                  changed_dirs+=$dir$'\n'
+              echo "  - $dir"
+              if [[ -d "$dir" ]]; then
+                  changed_dirs+=($dir)
               fi
           done
-          echo "Directories with changes: $changed_dirs"
-          echo "changed_tf_dirs=$changed_dirs" >> $GITHUB_OUTPUT
+
+          # Get unique directories
+          IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
+
+          echo "Existing directories with changes: ${changed_dirs[@]}"
+          echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 
   release_module:
     name: Release module
@@ -92,23 +98,23 @@ jobs:
           }
           
           # Set changed dirs
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
 
           # Set environment
           environment="${{ env.ENVIRONMENT }}"
           environment="${environment^^}"
 
           # Process module version tags
-          for dir in $changed_dirs; do
-            # Replace 'terraform-modules' with 'dev/TF' in directory
+          for dir in "${changed_dirs[@]}"; do
+            # Replace modules directory with 'dev/TF'
             dir=$(echo "$dir" | sed "s|${{ env.TF_MODULE_DIR }}|$environment/TF|")
 
-            latest_version=$(get_latest_version $dir)
+            latest_version=$(get_latest_version "$dir")
             if [ -z "$latest_version" ]; then
                 echo "No existing tags found for $dir. Starting with version v0.0.1"
                 new_version="v0.0.1"
             else
-                new_version=$(increment_version $latest_version)
+            new_version=$(increment_version "$latest_version")
             fi
 
             # Create new tag
@@ -116,5 +122,5 @@ jobs:
             echo "New version: $new_tag"
 
             # Tag Git
-            git tag $new_tag && git push origin $new_tag
+            git tag "$new_tag" && git push origin "$new_tag"
           done

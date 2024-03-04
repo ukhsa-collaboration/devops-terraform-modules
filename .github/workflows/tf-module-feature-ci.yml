@@ -59,7 +59,7 @@ jobs:
     name: Terraform lint and validation
     needs: pre-build
     runs-on: ubuntu-latest
-    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
+    if: ${{ needs.pre-build.outputs.changed_directories }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -118,7 +118,7 @@ jobs:
     name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
-    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
+    if: ${{ needs.pre-build.outputs.changed_directories }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -158,7 +158,7 @@ jobs:
     name: Generate Terraform docs
     needs: pre-build
     runs-on: ubuntu-latest
-    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
+    if: ${{ needs.pre-build.outputs.changed_directories }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -8,6 +8,7 @@
 #     Naming and tagging Config      #
 ######################################
 module "tags" {
+  #checkov:skip=CKV_TF_1:Versions are used instead of commit hashes
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.6"
 
   project         = var.tags.project
@@ -18,6 +19,7 @@ module "tags" {
 }
 
 module "resource_name_prefix" {
+  #checkov:skip=CKV_TF_1:Versions are used instead of commit hashes
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/resource-name-prefix?ref=TF/helpers/resource-name-prefix/vALPHA_0.0.2"
 
   name = module.tags.tags["Project"]

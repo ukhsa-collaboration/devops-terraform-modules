@@ -16,13 +16,13 @@ env:
   TERRAFORM_VERSION: "1.7.4"
   TERRAFORM_DOCS_VERSION: "v0.17.0"
   PYTHON_VERSION: "3.12"
-  CHECKOV_VERSION: "3.2.26"
+  CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 
   ENVIRONMENT: "dev"
 
 jobs:
   pre-build:
-    name: pre-build
+    name: Pre-build steps
     runs-on: ubuntu-latest
     outputs:
       is_pull_request: ${{ steps.check_event.outputs.is_pr }}
@@ -54,20 +54,27 @@ jobs:
         id: identify_changed_folders
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
-          changed_dirs=""
+          changed_dirs=()
+          echo 'Getting directories with changes...'
           for file in $changed_files; do
               dir=$(dirname "$file")
-              if [ -d "$dir" ]; then
-                  changed_dirs+=$dir$'\n'
+              echo "  - $dir"
+              if [[ -d "$dir" ]]; then
+                  changed_dirs+=($dir)
               fi
           done
-          echo "Directories with changes: $changed_dirs"
-          echo "changed_tf_dirs=$changed_dirs" >> $GITHUB_OUTPUT
+
+          # Get unique directories
+          IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
+
+          echo "Existing directories with changes: ${changed_dirs[@]}"
+          echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 
   terraform-lint-and-validate:
     name: Terraform lint and validation
     needs: pre-build
     runs-on: ubuntu-latest
+    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -88,16 +95,20 @@ jobs:
 
       - name: Terraform initialize
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            (cd $dir && terraform init)
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Initialising Terraform in directory: $dir"
+            (cd "$dir" && terraform init) || {
+              echo "Failed to initialise: $dir. Please check 'terraform init' runs."
+              exit 1
+            }
           done
 
       - name: Check Terraform format
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            # Change to each directory and check formatting
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Checking Terraform format in directory: $dir"
             (cd "$dir" && terraform fmt -check) || {
               echo "Formatting issues found in $dir. Please run 'terraform fmt -recursive' to fix them."
               exit 1
@@ -106,14 +117,15 @@ jobs:
 
       - name: Validate Terraform
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
-            (cd $dir && terraform validate)
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
+            echo "Validating Terraform in directory: $dir"
+            (cd "$dir" && terraform validate)
           done
 
       # - name: Terraform Plan
       #   run: |
-      #     for dir in ${{ needs.pre-build.outputs.tf_module_dirs }}; do
+      #     for dir in (${{ needs.pre-build.outputs.changed_directories }}); do
       #       cd $dir && terraform plan
       #     done
 
@@ -121,6 +133,7 @@ jobs:
     name: Terraform security scan
     needs: pre-build
     runs-on: ubuntu-latest
+    if: ${{ needs.pre-build.outputs.changed_directories }} != ''
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -149,10 +162,10 @@ jobs:
 
       - name: Run Checkov
         run: |
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
-          for dir in $changed_dirs; do
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
+          for dir in "${changed_dirs[@]}"; do
             echo "Running Checkov on directory: $dir"
-            checkov -d $dir --download-external-modules true || true
+            checkov -d "$dir" --download-external-modules true
           done
           
   release_module:
@@ -181,25 +194,25 @@ jobs:
               local latest_tag=$(git tag --list "${module_tag}/v*" | sort -V | tail -n1)
               echo "${latest_tag##*/}"
           }
-          
+
           # Set changed dirs
-          changed_dirs="${{ needs.pre-build.outputs.changed_directories }}"
+          changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
 
           # Set environment
           environment="${{ env.ENVIRONMENT }}"
           environment="${environment^^}"
 
           # Process module version tags
-          for dir in $changed_dirs; do
-            # Replace 'terraform-modules' with 'dev/TF' in directory
+          for dir in "${changed_dirs[@]}"; do
+            # Replace modules directory with 'dev/TF'
             dir=$(echo "$dir" | sed "s|${{ env.TF_MODULE_DIR }}|$environment/TF|")
 
-            latest_version=$(get_latest_version $dir)
+            latest_version=$(get_latest_version "$dir")
             if [ -z "$latest_version" ]; then
                 echo "No existing tags found for $dir. Starting with version v0.0.1"
                 new_version="v0.0.1"
             else
-                new_version=$(increment_version $latest_version)
+                new_version=$(increment_version "$latest_version")
             fi
 
             # Create new tag
@@ -207,5 +220,5 @@ jobs:
             echo "New version: $new_tag"
 
             # Tag Git
-            git tag $new_tag && git push origin $new_tag
+            git tag "$new_tag" && git push origin "$new_tag"
           done

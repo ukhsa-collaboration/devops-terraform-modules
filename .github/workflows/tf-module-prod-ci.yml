@@ -114,7 +114,7 @@ jobs:
                 echo "No existing tags found for $dir. Starting with version v0.0.1"
                 new_version="v0.0.1"
             else
-            new_version=$(increment_version "$latest_version")
+                new_version=$(increment_version "$latest_version")
             fi
 
             # Create new tag

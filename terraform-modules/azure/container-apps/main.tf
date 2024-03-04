@@ -1,9 +1,3 @@
-/*
-  Terraform module for creating Azure container apps.
-
-  This module provisions the necessary resources for the Azure containe apps services.
-*/
-
 ######################################
 #     Naming and tagging Config      #
 ######################################

@@ -1,3 +1,7 @@
+######################################
+#     Naming and tagging Config      #
+######################################
+
 module "tags" {
   source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.6"
 
@@ -14,6 +18,10 @@ module "resource_name_prefix" {
   name = module.tags.tags["Project"]
   tags = module.tags.tags
 }
+
+######################################
+#              Webapp                #
+######################################
 
 resource "azurerm_windows_web_app" "web_app" {
   name = "${module.resource_name_prefix.resource_name}-${var.webapp_config.web_app_name}"
@@ -83,6 +91,10 @@ resource "azurerm_windows_web_app" "web_app" {
     }
   }
 }
+
+######################################
+#              Connetion             #
+######################################
 
 resource "azurerm_app_service_connection" "connection" {
   count              = var.webapp_connection_config.service_connection_name == null ? 0 : 1

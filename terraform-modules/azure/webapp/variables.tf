@@ -1,4 +1,8 @@
 
+######################################
+#     Environment setup              #
+######################################
+
 variable "env" {
   description = "The environment in which the resources will be deployed"
   type        = string
@@ -14,10 +18,18 @@ variable "location" {
   type        = string
 }
 
+######################################
+#          Service plan              #
+######################################
+
 variable "service_plan_id" {
   description = "The ID of the Azure App Service Plan"
   type        = string
 }
+
+######################################
+#     Webapp config                  #
+######################################
 
 variable "webapp_config" {
   description = "Configuration settings for the Azure Web App"
@@ -58,7 +70,9 @@ variable "webapp_storage" {
   })
 }
 
-##### connection variables
+######################################
+#     Connection varialbles          #
+######################################
 
 variable "connection_target_resource" {
   description = "Enable Always On for the Azure Web App"
@@ -73,6 +87,10 @@ variable "webapp_connection_config" {
   })
   default = {}
 }
+
+######################################
+#            Tagging                 #
+######################################
 
 variable "tags" {
   description = "(Required) Tags to be assigned to the resources, must include project, client, owner and environment keys"

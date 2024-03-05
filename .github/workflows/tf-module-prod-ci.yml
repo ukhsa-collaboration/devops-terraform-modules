@@ -1,4 +1,4 @@
-name: "Terrform module: prod"
+name: "Terraform module: prod"
 
 on:
   push:

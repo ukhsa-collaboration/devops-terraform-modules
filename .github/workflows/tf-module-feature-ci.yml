@@ -167,11 +167,19 @@ jobs:
 
       - name: Setup Terraform docs
         run: |
-          curl -Lo ./terraform-docs.tar.gz "https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname)-amd64.tar.gz"
-          tar -xzf terraform-docs.tar.gz
-          chmod +x terraform-docs
-          sudo mv terraform-docs /usr/local/bin/terraform-docs 
-          rm -rfv terraform-docs.tar.gz
+          if pushd $(mktemp -d || echo "..ERRORTMPDIR.."); then
+            echo "Downloading terraform-docs..."
+            curl -Lo ./terraform-docs.tar.gz "https://github.com/terraform-docs/terraform-docs/releases/download/${{ env.TERRAFORM_DOCS_VERSION }}/terraform-docs-${{ env.TERRAFORM_DOCS_VERSION }}-$(uname | tr '[:upper:]' '[:lower:]')-amd64.tar.gz"
+
+            echo "Extracting and setting up terraform-docs..."
+            tar -xzf terraform-docs.tar.gz
+            chmod +x terraform-docs
+            sudo mv terraform-docs /usr/local/bin/terraform-docs
+
+            echo "Cleaning up..."
+            rm -rfv $(pwd)
+            popd
+          fi
 
       - name: Update module READMEs
         run: |

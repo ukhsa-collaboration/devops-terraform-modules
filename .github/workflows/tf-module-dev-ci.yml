@@ -63,10 +63,10 @@ jobs:
                   changed_dirs+=($dir)
               fi
           done
-          
+
           # Get unique directories
           IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
-          
+
           echo "Existing directories with changes: ${changed_dirs[@]}"
           echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 

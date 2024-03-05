@@ -1,4 +1,4 @@
-name: "Terrform module: prod"
+name: "Terraform module: prod"
 
 on:
   push:
@@ -18,7 +18,7 @@ env:
   PYTHON_VERSION: "3.12"
   CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 
-  ENVIRONMENT: "dev"
+  ENVIRONMENT: "prod"
 
 jobs:
   pre-build:

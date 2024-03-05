@@ -63,10 +63,10 @@ jobs:
                   changed_dirs+=($dir)
               fi
           done
-          
+
           # Get unique directories
           IFS=" " read -r -a changed_dirs <<< "$(tr ' ' '\n' <<< "${changed_dirs[@]}" | sort -u | tr '\n' ' ')"
-          
+
           echo "Existing directories with changes: ${changed_dirs[@]}"
           echo "changed_tf_dirs=${changed_dirs[@]}" >> $GITHUB_OUTPUT
 
@@ -114,7 +114,7 @@ jobs:
                 echo "No existing tags found for $dir. Starting with version v0.0.1"
                 new_version="v0.0.1"
             else
-              new_version=$(increment_version "$latest_version")
+                new_version=$(increment_version "$latest_version")
             fi
 
             # Create new tag

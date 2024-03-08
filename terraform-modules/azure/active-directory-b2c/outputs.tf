@@ -1,4 +1,3 @@
-
 output "azure_b2c_id" {
   description = "The ID of the AAD B2C Directory."
   value       = azurerm_aadb2c_directory.azure_b2c.id

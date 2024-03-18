@@ -34,10 +34,6 @@ resource "azurerm_windows_web_app" "web_app" {
   client_certificate_enabled    = var.webapp_config.client_certificate_enabled
   public_network_access_enabled = var.webapp_config.public_network_access_enabled
 
-  tags = {
-    environment = module.tags.tags
-  }
-
   identity {
     type = "SystemAssigned"
   }
@@ -80,6 +76,7 @@ resource "azurerm_windows_web_app" "web_app" {
       enabled = var.webapp_config.auth_settings_enabled
     }
   }
+  tags = module.tags.tags
 }
 
 ######################################

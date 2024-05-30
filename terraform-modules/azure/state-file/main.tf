@@ -11,11 +11,11 @@ resource "azurerm_resource_group" "this" {
 
 # Create storage account
 resource "azurerm_storage_account" "this" {
-for_each = var.storage_account
-  name                     = "${each.key}-${var.environment}-${random_string.resource_code.result}"
-  resource_group_name      = azurerm_resource_group.this.name
-  location                 = azurerm_resource_group.this.location
-  
+  for_each            = var.storage_account
+  name                = "${each.key}${var.environment}${random_string.resource_code.result}"
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
   account_kind                      = each.value.account_kind
   account_tier                      = each.value.account_tier
   account_replication_type          = each.value.account_replication_type
@@ -26,19 +26,20 @@ for_each = var.storage_account
   infrastructure_encryption_enabled = each.value.infrastructure_encryption_enabled
 
 
-#   blob_properties {
-#     versioning_enabled            = true
-#     change_feed_enabled           = true
-#     change_feed_retention_in_days = 90
-#     last_access_time_enabled      = true
+  dynamic "blob_properties" {
+    for_each = each.value.blob_properties[*]
+    content {
+      versioning_enabled            = each.value.blob_properties.versioning_enabled
+      change_feed_enabled           = each.value.blob_properties.change_feed_enabled
+      change_feed_retention_in_days = each.value.blob_properties.change_feed_retention_in_days
+      last_access_time_enabled      = each.value.blob_properties.last_access_time_enabled
+    }
+    # delete_retention_policy {
+    #   days = each.value.blob_properties.delete_retention_policy
+    # }
 
-#     delete_retention_policy {
-#       days = 30
-#     }
-
-#     container_delete_retention_policy {
-#       days = 30
-#     }
-
-#   }
+    # container_delete_retention_policy {
+    #   days = each.value.blob_properties.change_feed_retention_in_days
+    # }
+  }
 }

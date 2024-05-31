@@ -41,8 +41,17 @@ variable "storage_account" {
         days = optional(number)
       }))
     }))
-
-
+    sas_policy = optional(object({
+      expiration_period = string
+      expiration_action = optional(string, "Log")
+    }))
+  }))
+}
+variable "storage_container" {
+  description = "Azure storage container configuration"
+  type = map(object({
+    container_access_type = optional(string, "private")
+    storage_account_name  = string
   }))
   default = {}
 }

@@ -16,7 +16,12 @@ module "state_test" {
           days = 40
         }
       }
-
+      sas_policy = {
+        expiration_period = "00.02:00:00"
+  } } }
+  storage_container = {
+    "statestorage1" = {
+      storage_account_name = "stateaccount1"
     }
   }
 }

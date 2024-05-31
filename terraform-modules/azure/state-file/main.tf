@@ -48,6 +48,21 @@ resource "azurerm_storage_account" "this" {
       }
     }
   }
+  dynamic "sas_policy" {
+    for_each = each.value.sas_policy[*]
+    content {
+      expiration_period = sas_policy.value.expiration_period
+      expiration_action = sas_policy.value.expiration_action
+    }
+  }
 }
+resource "azurerm_storage_container" "this" {
+  for_each = var.storage_container
+
+  name                  = each.key
+  storage_account_name  = azurerm_storage_account.this[each.value.storage_account_name].name
+  container_access_type = each.value.container_access_type
+}
+
 
 

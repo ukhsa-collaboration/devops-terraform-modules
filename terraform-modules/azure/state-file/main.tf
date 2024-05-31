@@ -33,13 +33,21 @@ resource "azurerm_storage_account" "this" {
       change_feed_enabled           = each.value.blob_properties.change_feed_enabled
       change_feed_retention_in_days = each.value.blob_properties.change_feed_retention_in_days
       last_access_time_enabled      = each.value.blob_properties.last_access_time_enabled
-    }
-    # delete_retention_policy {
-    #   days = each.value.blob_properties.delete_retention_policy
-    # }
 
-    # container_delete_retention_policy {
-    #   days = each.value.blob_properties.change_feed_retention_in_days
-    # }
+      dynamic "delete_retention_policy" {
+        for_each = blob_properties.value.delete_retention_policy[*]
+        content {
+          days = delete_retention_policy.value.days
+        }
+      }
+      dynamic "container_delete_retention_policy" {
+        for_each = blob_properties.value.container_delete_retention_policy[*]
+        content {
+          days = container_delete_retention_policy.value.days
+        }
+      }
+    }
   }
 }
+
+

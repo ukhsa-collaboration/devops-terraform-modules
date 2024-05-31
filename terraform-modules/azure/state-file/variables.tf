@@ -33,15 +33,16 @@ variable "storage_account" {
       change_feed_enabled           = optional(string, "true")
       change_feed_retention_in_days = optional(number, 90)
       last_access_time_enabled      = optional(string, true)
+
+      delete_retention_policy = optional(object({
+        days = optional(number)
+      }))
+      container_delete_retention_policy = optional(object({
+        days = optional(number)
+      }))
     }))
 
-    # delete_retention_policy = optional(object({
-    #   days = optional(number)
-    # }))
 
-    # container_delete_retention_policy = optional(object({
-    #   days = optional(number)
-    # }))
   }))
   default = {}
 }

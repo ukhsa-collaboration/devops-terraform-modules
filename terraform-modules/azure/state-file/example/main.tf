@@ -24,4 +24,14 @@ module "state_test" {
       storage_account_name = "stateaccount1"
     }
   }
+  role_definition = {
+    "storageaccess" = {
+        storage_account_name = "stateaccount1"
+        actions = ["Microsoft.Storage/storageAccounts/blobServices/containers/read",
+                    "Microsoft.Storage/storageAccounts/blobServices/generateUserDelegationKey/action"]
+        data_actions = [ "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/write",
+      "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/add/action"]
+    }
+  }
 }

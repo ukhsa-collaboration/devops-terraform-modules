@@ -9,9 +9,7 @@ No providers.
 
 ## Modules
 
-| Name | Source | Version |
-|------|--------|---------|
-| <a name="module_state_test"></a> [state\_test](#module\_state\_test) | ../../ | n/a |
+No modules.
 
 ## Resources
 

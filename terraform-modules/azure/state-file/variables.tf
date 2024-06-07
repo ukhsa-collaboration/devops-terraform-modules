@@ -55,3 +55,14 @@ variable "storage_container" {
   }))
   default = {}
 }
+variable "role_definition" {
+    description = "Custom role definition allowing write access to the storage account"
+    type = map(object({
+    storage_account_name = string
+        permissions = optional(object({
+            actions = optional(list(string))
+            data_actions = optional(list(string))
+        }))
+    }))
+  default = {}
+}

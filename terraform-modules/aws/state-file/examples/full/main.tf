@@ -6,13 +6,13 @@ module "example" {
   region_name             = data.aws_region.current.name
 }
 
-#checkov:skip=CKV_AWS_273:Example resource
 resource "aws_iam_user" "example" {
+  #checkov:skip=CKV_AWS_273:Example resource. Not used.
   name = "example"
 }
 
-#checkov:skip=CKV_AWS_273:Example resource
 resource "aws_kms_key" "example" {
+  #checkov:skip=CKV_AWS_273:Example resource. Not used.
   description             = "Key used to encrypt both the state and logs buckets"
   enable_key_rotation     = true
   deletion_window_in_days = 7

@@ -21,7 +21,7 @@ jobs:
           root_dir="terraform-modules"
           module_dirs=$(find "$root_dir" -name '*.tf' -print | awk -F/ '{OFS="/"; $NF=""; print $0}' | sort -u | xargs)
           echo "Module Directories: $module_dirs"
-          echo "::set-output name=tf_module_directories::$module_dirs"
+          echo "tf_module_directories=$module_dirs" >> $GITHUB_OUTPUT
 
   generate-docs:
     name: Generate Terraform Docs

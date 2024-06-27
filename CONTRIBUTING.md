@@ -7,7 +7,7 @@ Welcome to DevOps Terraform Modules! This document outlines guidelines for contr
 Before you begin:
 - Familiarize yourself with Terraform Modules directory and the specific modules in this repository.
 - Read through the documentation, including `README.md` files in various directories.
-- Workflow for contributing is `feature/*` -> `dev` -> `prod`
+- Workflow for contributing is `feature/*` -> `main`
 
 ## Reporting Issues
 If you encounter bugs, please create an issue on GitHub using the repo's issue template
@@ -16,7 +16,7 @@ If you encounter bugs, please create an issue on GitHub using the repo's issue t
 To contribute, follow these steps:
 1. **Feature Branch:** Create a feature branch in called `feature/<your_feature_name_here>`
 2. **CI/CD:** A feature branch pipeline will run to test your changes - **ONLY MERGE YOUR FEATURE BRANCH IF THE CI PIPELINE IS PASSING**
-3. **CHANGELOG:** You must follow the format of the changelog and update it with a description of your feature before merging to `dev`
+3. **CHANGELOG:** You must follow the format of the changelog and update it with a description of your feature before merging to `main`
 
 ## Check for Existing Modules
 

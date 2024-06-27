@@ -1,14 +1,14 @@
-name: "Terraform module: dev"
+name: "Terraform module: release"
 
 on:
   push:
     branches:
-      - dev
+      - main
     paths:
       - 'terraform-modules/**/*.tf'
   pull_request:
     branches:
-      - dev
+      - main
     paths:
       - 'terraform-modules/**/*.tf'
 
@@ -18,7 +18,7 @@ env:
   PYTHON_VERSION: "3.12"
   CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 
-  ENVIRONMENT: "dev"
+  ENVIRONMENT: "main"
 
 jobs:
   pre-build:
@@ -50,7 +50,7 @@ jobs:
           echo "Module directories: $module_dirs"
           echo "tf_module_directories=$module_dirs" >> $GITHUB_OUTPUT
 
-      - name: Identify changed Terraform folders from 'dev' branch
+      - name: Identify changed Terraform folders from 'main' branch
         id: identify_changed_folders
         run: |
           changed_files=$(git diff --name-only HEAD^ HEAD | grep '\.tf$' | tr '\n' ' ')
@@ -122,13 +122,7 @@ jobs:
             echo "Validating Terraform in directory: $dir"
             (cd "$dir" && terraform validate)
           done
-
-      # - name: Terraform Plan
-      #   run: |
-      #     for dir in (${{ needs.pre-build.outputs.changed_directories }}); do
-      #       cd $dir && terraform plan
-      #     done
-
+        
   terraform-security-scan:
     name: Terraform security scan
     needs: pre-build
@@ -167,13 +161,13 @@ jobs:
             echo "Running Checkov on directory: $dir"
             checkov -d "$dir" --download-external-modules true
           done
-          
+
   release_module:
     name: Release module
-    needs: [ terraform-lint-and-validate, terraform-security-scan, pre-build ]
+    needs: [ pre-build ]
     if: ${{ needs.pre-build.outputs.is_pull_request == 'false' }}
-    runs-on: ubuntu-latest   
-    steps:  
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -194,7 +188,7 @@ jobs:
               local latest_tag=$(git tag --list "${module_tag}/v*" | sort -V | tail -n1)
               echo "${latest_tag##*/}"
           }
-
+          
           # Set changed dirs
           changed_dirs=(${{ needs.pre-build.outputs.changed_directories }})
 
@@ -204,7 +198,7 @@ jobs:
 
           # Process module version tags
           for dir in "${changed_dirs[@]}"; do
-            # Replace modules directory with 'dev/TF'
+            # Replace modules directory with 'main/TF'
             dir=$(echo "$dir" | sed "s|${{ env.TF_MODULE_DIR }}|$environment/TF|")
 
             latest_version=$(get_latest_version "$dir")

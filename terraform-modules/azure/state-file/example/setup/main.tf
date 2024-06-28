@@ -7,7 +7,7 @@ module "state_test" {
 
   storage_account = {
     "example" = {
-      account_replication_type = "GRS"
+      account_replication_type = "ZRS"
       shared_access_key_enabled = "true"
       blob_properties = {
         delete_retention_policy = {

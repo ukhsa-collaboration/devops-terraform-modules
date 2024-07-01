@@ -9,60 +9,39 @@ resource "azurerm_resource_group" "this" {
   location = var.location
 }
 
-# Create storage account
-resource "azurerm_storage_account" "this" {
-  for_each            = var.storage_account
-  name                = "${each.key}${var.environment}${random_string.resource_code.result}"
+module "storage_account" {
+  source = "git::https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount.git?ref=e017ac14fec632b1ca48592396f0078aa4773630" # Version 0.2.0 released 28/06/2024
+
+  name                = "${var.storage_account_name}${random_string.resource_code.result}"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
-  account_kind                      = each.value.account_kind
-  account_tier                      = each.value.account_tier
-  account_replication_type          = each.value.account_replication_type
-  enable_https_traffic_only         = each.value.enable_https_traffic_only
-  min_tls_version                   = each.value.min_tls_version
-  shared_access_key_enabled         = each.value.shared_access_key_enabled
-  default_to_oauth_authentication   = each.value.default_to_oauth_authentication
-  infrastructure_encryption_enabled = each.value.infrastructure_encryption_enabled
+  account_tier = "Standard"
+  shared_access_key_enabled = "false" # shared access keys should be enabled to true when Azure AD is resolve. https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount#:~:text=IMPORTANT%20We%20recommend%20using%20Azure%20AD%20authentication%20over%20Shared%20Key%20for%20provisioning%20Storage%20Containers%2C%20Blobs%2C%20and%20other%20items.
+  default_to_oauth_authentication = "false"
+  infrastructure_encryption_enabled = "true"
 
-
-  dynamic "blob_properties" {
-    for_each = each.value.blob_properties[*]
-    content {
-      versioning_enabled            = each.value.blob_properties.versioning_enabled
-      change_feed_enabled           = each.value.blob_properties.change_feed_enabled
-      change_feed_retention_in_days = each.value.blob_properties.change_feed_retention_in_days
-      last_access_time_enabled      = each.value.blob_properties.last_access_time_enabled
-
-      dynamic "delete_retention_policy" {
-        for_each = blob_properties.value.delete_retention_policy[*]
-        content {
-          days = delete_retention_policy.value.days
-        }
-      }
-      dynamic "container_delete_retention_policy" {
-        for_each = blob_properties.value.container_delete_retention_policy[*]
-        content {
-          days = container_delete_retention_policy.value.days
-        }
-      }
+  blob_properties = {
+    delete_retention_policy = {
+      days = 30
+    }
+    container_delete_retention_policy = {
+      days = 40
     }
   }
-  dynamic "sas_policy" {
-    for_each = each.value.sas_policy[*]
-    content {
-      expiration_period = sas_policy.value.expiration_period
-      expiration_action = sas_policy.value.expiration_action
-    }
+  sas_policy = {
+    expiration_period = "00.02:00:00"
   }
+
+ containers = {
+    application = {
+      name                  = "application"
+      container_access_type = "private"
+    }
+    core-services = {
+      name                  = "core-services"
+      container_access_type = "private"
+
+    }
 }
-resource "azurerm_storage_container" "this" {
-  for_each = var.storage_container
-
-  name                  = each.key
-  storage_account_name  = azurerm_storage_account.this[each.value.storage_account_name].name
-  container_access_type = each.value.container_access_type
 }
-
-
-

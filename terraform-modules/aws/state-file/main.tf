@@ -26,7 +26,8 @@ data "aws_iam_policy_document" "terraform_state_bucket" {
 }
 
 module "terraform_state" {
-  source = "terraform-aws-modules/s3-bucket/aws"
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "v4.1.2"
 
   bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state"
   acl    = "private"
@@ -39,7 +40,7 @@ module "terraform_state" {
   attach_deny_incorrect_encryption_headers = true
   attach_deny_incorrect_kms_key_sse        = true
   attach_deny_unencrypted_object_uploads   = true
-  
+
   control_object_ownership = true
   object_ownership         = "BucketOwnerEnforced"
 
@@ -69,42 +70,43 @@ module "terraform_state" {
 }
 
 module "terraform_state_log" {
-    source = "terraform-aws-modules/s3-bucket/aws"
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "v4.1.2"
 
-    bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state-logs"
-    acl    = "private"
+  bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state-logs"
+  acl    = "private"
 
-    attach_policy                            = true
-    attach_public_policy                     = true
-    attach_deny_insecure_transport_policy    = true
-    attach_require_latest_tls_policy         = true
-    attach_deny_incorrect_encryption_headers = true
-    attach_deny_incorrect_kms_key_sse        = true
-    attach_deny_unencrypted_object_uploads   = true
-    
-    control_object_ownership = true
-    object_ownership         = "BucketOwnerEnforced"
+  attach_policy                            = true
+  attach_public_policy                     = true
+  attach_deny_insecure_transport_policy    = true
+  attach_require_latest_tls_policy         = true
+  attach_deny_incorrect_encryption_headers = true
+  attach_deny_incorrect_kms_key_sse        = true
+  attach_deny_unencrypted_object_uploads   = true
 
-    access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
-    access_log_delivery_policy_source_buckets = module.terraform_state.s3_bucket_arn
+  control_object_ownership = true
+  object_ownership         = "BucketOwnerEnforced"
 
-    allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
+  access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
+  access_log_delivery_policy_source_buckets  = module.terraform_state.s3_bucket_arn
 
-    versioning = {
-      enabled = true
-    }
+  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
 
-    server_side_encryption_configuration = {
-      rule = {
-        #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
-        apply_server_side_encryption_by_default = {
-          kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-          sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
-        }
+  versioning = {
+    enabled = true
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
+        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
       }
     }
+  }
 }
-  
+
 
 resource "aws_dynamodb_table" "terraform_locks" {
   # checkov:skip=CKV_AWS_28:The state lock table is ephemeral and doesn't need PITR.

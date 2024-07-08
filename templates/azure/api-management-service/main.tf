@@ -13,11 +13,11 @@ module "tags" {
 module "virtual_network" {
   source = "../../../terraform-modules/azure/virtual-network"
 
-  name                = var.name
+  name           = var.name
   resource_group = var.resource_group
-  address_space       = ["10.0.0.0/16"]
-  dns_servers         = ["10.0.0.4", "10.0.0.5"]
-  tags = module.tags.tags
+  address_space  = ["10.0.0.0/16"]
+  dns_servers    = ["10.0.0.4", "10.0.0.5"]
+  tags           = module.tags.tags
 }
 
 module "app_gw_subnet" {

@@ -2,7 +2,6 @@ module "example" {
   source                  = "../.."
   iam_principals          = [aws_iam_user.example.arn]
   state_bucket_kms_key_id = aws_kms_key.example.arn
-  logs_bucket_kms_key_id  = aws_kms_key.example.arn
   region_name             = data.aws_region.current.name
 }
 
@@ -24,10 +23,10 @@ resource "aws_kms_key_policy" "example" {
     Id = "example"
     Statement = [
       {
-        Sid = "Enable IAM User Permissions"
+        Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {
-          AWS = "${aws_iam_user.example.arn}"
+          AWS = aws_iam_user.example.arn
         }
         Action = [
           "kms:Encrypt",
@@ -39,7 +38,7 @@ resource "aws_kms_key_policy" "example" {
         Resource = "*"
       },
       {
-        Sid = "Allow Logs Service to use the key"
+        Sid    = "Allow Logs Service to use the key"
         Effect = "Allow"
         Principal = {
           Service = "logs.${data.aws_region.current.name}.amazonaws.com"

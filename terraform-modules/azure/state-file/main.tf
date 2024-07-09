@@ -17,9 +17,13 @@ module "storage_account" {
   location            = azurerm_resource_group.this.location
 
   account_tier = "Standard"
-  shared_access_key_enabled = "false" # shared access keys should be enabled to true when Azure AD is resolve. https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount#:~:text=IMPORTANT%20We%20recommend%20using%20Azure%20AD%20authentication%20over%20Shared%20Key%20for%20provisioning%20Storage%20Containers%2C%20Blobs%2C%20and%20other%20items.
+  shared_access_key_enabled = "true" # shared access keys should be enabled to true when Azure AD is resolve. https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount#:~:text=IMPORTANT%20We%20recommend%20using%20Azure%20AD%20authentication%20over%20Shared%20Key%20for%20provisioning%20Storage%20Containers%2C%20Blobs%2C%20and%20other%20items.
   default_to_oauth_authentication = "false"
   infrastructure_encryption_enabled = "true"
+  public_network_access_enabled = "true"
+  network_rules = {
+    default_action = "Allow"
+  }
 
   blob_properties = {
     delete_retention_policy = {

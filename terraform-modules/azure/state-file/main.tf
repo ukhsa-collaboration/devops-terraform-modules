@@ -46,3 +46,9 @@ module "storage_account" {
     }
 }
 }
+
+resource "null_resource" "upload" {
+  provisioner "local-exec" {
+    command = "az storage blob upload --account-name ${var.storage_account_name} --container-name state --name terraform.tfstate --file ./terraform.tfstate --account-key ${data.azurerm_storage_account.this.primary_access_key} --overwrite"
+    }
+    }

@@ -16,9 +16,3 @@ variable "resource_group_name" {
   default     = "tfstate"
 }
 
-variable "environment" {
-  description = "The environment you are created eg. dev"
-  type        = string
-  default     = "dev"
-}
-

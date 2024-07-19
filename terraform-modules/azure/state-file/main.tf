@@ -1,18 +1,12 @@
-resource "random_string" "resource_code" {
-  length  = 5
-  special = false
-  upper   = false
-}
-
 resource "azurerm_resource_group" "this" {
-  name     = "${var.resource_group_name}-${var.environment}"
+  name     = "${var.resource_group_name}"
   location = var.location
 }
 
 module "storage_account" {
   source = "git::https://github.com/Azure/terraform-azurerm-avm-res-storage-storageaccount.git?ref=e017ac14fec632b1ca48592396f0078aa4773630" # Version 0.2.0 released 28/06/2024
 
-  name                = "${var.storage_account_name}${random_string.resource_code.result}"
+  name                = "${var.storage_account_name}"
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
 
@@ -49,3 +43,25 @@ module "storage_account" {
     }
 }
 }
+
+# resource "azurerm_storage_share" "this" {
+#   name                 = "state-upload"
+#   storage_account_name = module.storage_account.name
+#   quota                = 1
+   
+#     acl {
+#     id = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI"
+
+#     access_policy {
+#       permissions = "rwdl"
+#     }
+#   }
+
+#   depends_on = [module.storage_account]
+# }
+
+# resource "azurerm_storage_share_file" "this" {
+#   name             = "terraform.tfstate"
+#   storage_share_id = azurerm_storage_share.this.id
+#   source           = "terraform.tfstate"
+# }

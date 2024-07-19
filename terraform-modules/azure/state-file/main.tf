@@ -39,29 +39,10 @@ module "storage_account" {
     core-services = {
       name                  = "core-services"
       container_access_type = "private"
-
+    }
+    state = {
+      name                  = "state"
+      container_access_type = "private"
     }
 }
 }
-
-# resource "azurerm_storage_share" "this" {
-#   name                 = "state-upload"
-#   storage_account_name = module.storage_account.name
-#   quota                = 1
-   
-#     acl {
-#     id = "MTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTI"
-
-#     access_policy {
-#       permissions = "rwdl"
-#     }
-#   }
-
-#   depends_on = [module.storage_account]
-# }
-
-# resource "azurerm_storage_share_file" "this" {
-#   name             = "terraform.tfstate"
-#   storage_share_id = azurerm_storage_share.this.id
-#   source           = "terraform.tfstate"
-# }

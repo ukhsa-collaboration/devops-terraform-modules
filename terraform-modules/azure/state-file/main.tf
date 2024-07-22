@@ -15,6 +15,7 @@ module "storage_account" {
   default_to_oauth_authentication   = "false"
   infrastructure_encryption_enabled = "true"
   public_network_access_enabled     = "true"
+  enable_telemetry = "false"
   network_rules = {
     default_action = "Allow"
   }

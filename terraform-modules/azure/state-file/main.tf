@@ -33,8 +33,8 @@ module "storage_account" {
   }
 
   containers = {
-    application = {
-      name                  = "application"
+    applications = {
+      name                  = "applications"
       container_access_type = "private"
     }
     core-services = {

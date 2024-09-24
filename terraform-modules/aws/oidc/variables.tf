@@ -26,3 +26,11 @@ variable "iam_policy_arn" {
   type        = string
   default     = ""
 }
+
+variable "additional_allowed_repos" {
+  description = "A map of additional Github repos and their audiences that can assume the AWS role"
+  type = map(object({
+    aud = string
+  }))
+  default = {}
+}

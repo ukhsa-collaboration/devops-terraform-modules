@@ -21,12 +21,14 @@ No modules.
 | [aws_iam_openid_connect_provider.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_openid_connect_provider) | resource |
 | [aws_iam_policy.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_policy_document.iam_role_assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [tls_certificate.this](https://registry.terraform.io/providers/hashicorp/tls/latest/docs/data-sources/certificate) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_allowed_repos"></a> [additional\_allowed\_repos](#input\_additional\_allowed\_repos) | A object of additional Github repos that can assume the AWS role | <pre>object({<br>    "aud" : string<br>  })</pre> | `{}` | no |
 | <a name="input_allowed_refs"></a> [allowed\_refs](#input\_allowed\_refs) | The 'audience' that should be allowed to assume the role. Use '*' for all branches / enviroments. <br>      By default, only the 'main' branch can assume the role.<br><br>      For more examples on how to filter by branch, environment, tag or event type see:<br>      https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#example-subject-claims | `string` | `"ref:refs/heads/main"` | no |
 | <a name="input_iam_policy_arn"></a> [iam\_policy\_arn](#input\_iam\_policy\_arn) | The ARN of the IAM policy that the OIDC role should use. Will use a default policy if not specified. | `string` | `""` | no |
 | <a name="input_repo_name"></a> [repo\_name](#input\_repo\_name) | The full name of the Github Repo that should be allowed to assume the role. E.g. UKHSA-Internal/devops-terraform-example-project | `string` | n/a | yes |

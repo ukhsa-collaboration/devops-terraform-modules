@@ -21,33 +21,44 @@ resource "aws_iam_openid_connect_provider" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name        = "github-actions-oidc"
-  description = "The role used by the Github repo ${var.repo_name} to manage AWS resources"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      Action = "sts:AssumeRoleWithWebIdentity"
-      Principal = {
-        Federated = aws_iam_openid_connect_provider.this.arn
-      }
-      Condition = {
-        StringLike = {
-          "token.actions.githubusercontent.com:aud" : ["sts.amazonaws.com"],
-        }
-        StringLike = {
-          "token.actions.githubusercontent.com:sub" = [
-            "repo:${var.repo_name}:${var.allowed_refs}"
-          ]
-        }
-      }
-    }]
-  })
+  name               = "github-actions-oidc"
+  description        = "The role used by the Github repo ${var.repo_name} to manage AWS resources"
+  assume_role_policy = data.aws_iam_policy_document.iam_role_assume_role.json
 
   managed_policy_arns = [local.iam_policy_arn]
   tags                = var.tags
 }
 
+data "aws_iam_policy_document" "iam_role_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.this.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "ForAnyValue:StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values = concat(
+        ["repo:${var.repo_name}:${var.allowed_refs}"],
+        [
+          for repo, details in var.additional_allowed_repos :
+          "repo:${repo}:${details.aud}"
+        ]
+      )
+
+    }
+  }
+}
 
 resource "aws_iam_policy" "this" {
   name = "github-actions-oidc"

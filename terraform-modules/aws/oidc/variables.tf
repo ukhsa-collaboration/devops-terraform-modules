@@ -10,7 +10,13 @@ variable "repo_name" {
 }
 
 variable "allowed_refs" {
-  description = "The Github reference that should be allowed to assume the role. Use '*' for all branches / enviroment. By default, only the 'main' branch can assume the role"
+  description = <<EOF
+      The 'audience' that should be allowed to assume the role. Use '*' for all branches / enviroments. 
+      By default, only the 'main' branch can assume the role.
+
+      For more examples on how to filter by branch, environment, tag or event type see:
+      https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#example-subject-claims
+    EOF
   type        = string
   default     = "ref:refs/heads/main"
 }

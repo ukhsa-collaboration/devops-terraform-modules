@@ -27,7 +27,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_allowed_refs"></a> [allowed\_refs](#input\_allowed\_refs) | The Github reference that should be allowed to assume the role. Use '*' for all branches / enviroment. By default, only the 'main' branch can assume the role | `string` | `"ref:refs/heads/main"` | no |
+| <a name="input_allowed_refs"></a> [allowed\_refs](#input\_allowed\_refs) | The 'audience' that should be allowed to assume the role. Use '*' for all branches / enviroments. <br>      By default, only the 'main' branch can assume the role.<br><br>      For more examples on how to filter by branch, environment, tag or event type see:<br>      https://docs.github.com/en/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect#example-subject-claims | `string` | `"ref:refs/heads/main"` | no |
 | <a name="input_iam_policy_arn"></a> [iam\_policy\_arn](#input\_iam\_policy\_arn) | The ARN of the IAM policy that the OIDC role should use. Will use a default policy if not specified. | `string` | `""` | no |
 | <a name="input_repo_name"></a> [repo\_name](#input\_repo\_name) | The full name of the Github Repo that should be allowed to assume the role. E.g. UKHSA-Internal/devops-terraform-example-project | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to assign | `map(string)` | `{}` | no |
@@ -36,6 +36,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_aws_iam_openid_connect_provider"></a> [aws\_iam\_openid\_connect\_provider](#output\_aws\_iam\_openid\_connect\_provider) | n/a |
-| <a name="output_aws_iam_role"></a> [aws\_iam\_role](#output\_aws\_iam\_role) | n/a |
+| <a name="output_aws_iam_openid_connect_provider"></a> [aws\_iam\_openid\_connect\_provider](#output\_aws\_iam\_openid\_connect\_provider) | The ARN of the OpenID Connector Provider |
+| <a name="output_aws_iam_role"></a> [aws\_iam\_role](#output\_aws\_iam\_role) | The ARN of the IAM role |
 <!-- END_TF_DOCS -->

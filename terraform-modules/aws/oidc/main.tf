@@ -46,7 +46,7 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
     }
 
     condition {
-      test     = "ForAnyValue:StringEquals"
+      test     = "ForAnyValue:StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = concat(
         ["repo:${var.repo_name}:${var.allowed_refs}"],
@@ -120,7 +120,8 @@ resource "aws_iam_policy" "this" {
           "iam:DeletePolicy",
           "iam:DeletePolicyVersion",
           "iam:CreatePolicy",
-          "iam:CreatePolicyVersion"
+          "iam:CreatePolicyVersion",
+          "iam:GetOpenIDConnectProvider"
         ],
         "Resource" : [
           "*"

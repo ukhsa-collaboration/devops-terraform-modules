@@ -7,6 +7,11 @@ variable "tags" {
 variable "repo_name" {
   description = "The full name of the Github Repo that should be allowed to assume the role. E.g. UKHSA-Internal/devops-terraform-example-project"
   type        = string
+
+  validation {
+    condition     = var.repo_name != "*"
+    error_message = "The repo_name variable must not be a wildcard"
+  }
 }
 
 variable "allowed_refs" {

@@ -21,7 +21,7 @@ resource "aws_iam_openid_connect_provider" "this" {
 }
 
 resource "aws_iam_role" "this" {
-  name               = "github-actions-oidc"
+  name               = var.role_name
   description        = "The role used by the Github repo ${var.repo_name} to manage AWS resources"
   assume_role_policy = data.aws_iam_policy_document.iam_role_assume_role.json
 

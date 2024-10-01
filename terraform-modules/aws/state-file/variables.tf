@@ -14,3 +14,9 @@ variable "region_name" {
   description = "Name of the region that the state file is responsible for"
   type        = string
 }
+
+variable "service_prefix" {
+  description = "The prefix to give to resources to allow multiple services to use the same AWS account"
+  type = "string"
+  default = ""  
+}

@@ -29,7 +29,7 @@ module "terraform_state" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "v4.1.2"
 
-  bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state"
+  bucket = "${var.service_prefix}${data.aws_caller_identity.current.account_id}-${var.region_name}-state"
 
   attach_policy                            = true
   attach_public_policy                     = true
@@ -71,7 +71,7 @@ module "terraform_state_log" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "v4.1.2"
 
-  bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state-logs"
+  bucket = "${var.service_prefix}${data.aws_caller_identity.current.account_id}-${var.region_name}-state-logs"
 
   attach_policy                            = true
   attach_public_policy                     = true
@@ -108,7 +108,7 @@ module "terraform_state_log" {
 resource "aws_dynamodb_table" "terraform_locks" {
   # checkov:skip=CKV_AWS_28:The state lock table is ephemeral and doesn't need PITR.
   # checkov:skip=CKV_AWS_119:No data is contained in this table. Encrypting with CMK is unnecessary.
-  name         = "${var.region_name}-state-locks"
+  name         = "${var.service_prefix}${var.region_name}-state-locks"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"
 

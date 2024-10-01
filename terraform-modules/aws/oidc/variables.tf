@@ -4,6 +4,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "role_name" {
+  description = "The name of the IAM role to create"
+  type        = string
+  default     = "github-actions-oidc"
+}
+
 variable "repo_name" {
   description = "The full name of the Github Repo that should be allowed to assume the role. E.g. UKHSA-Internal/devops-terraform-example-project"
   type        = string

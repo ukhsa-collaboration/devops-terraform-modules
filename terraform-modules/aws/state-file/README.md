@@ -30,6 +30,7 @@ No requirements.
 |------|-------------|------|---------|:--------:|
 | <a name="input_iam_principals"></a> [iam\_principals](#input\_iam\_principals) | A list of IAM user or role ARNs that will have access to the state S3 bucket | `list(string)` | n/a | yes |
 | <a name="input_region_name"></a> [region\_name](#input\_region\_name) | Name of the region that the state file is responsible for | `string` | n/a | yes |
+| <a name="input_service_prefix"></a> [service\_prefix](#input\_service\_prefix) | The prefix to give to resources to allow multiple services to use the same AWS account | `string` | `""` | no |
 | <a name="input_state_bucket_kms_key_id"></a> [state\_bucket\_kms\_key\_id](#input\_state\_bucket\_kms\_key\_id) | The KMS key ID used to encrypt the S3 state bucket. Uses AWS-managed key if not specified. | `string` | `""` | no |
 
 ## Outputs

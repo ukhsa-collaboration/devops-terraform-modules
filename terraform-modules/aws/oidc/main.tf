@@ -6,6 +6,8 @@ locals {
   ]
 
   iam_policy_arn = var.iam_policy_arn != "" ? var.iam_policy_arn : aws_iam_policy.this.arn
+
+  aws_iam_openid_connect_provider_arn = var.create_openid_connect_provider ? aws_iam_openid_connect_provider.this[0].arn : data.aws_iam_openid_connect_provider.this[0].arn
 }
 
 data "tls_certificate" "this" {
@@ -26,6 +28,12 @@ moved {
   to   = aws_iam_openid_connect_provider.this[0]
 }
 
+data "aws_iam_openid_connect_provider" "this" {
+  count = var.create_openid_connect_provider ? 0 : 1
+
+  url = "https://token.actions.githubusercontent.com"
+}
+
 resource "aws_iam_role" "this" {
   name               = var.role_name
   description        = "The role used by the Github repo ${var.repo_name} to manage AWS resources"
@@ -42,7 +50,7 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.this.arn]
+      identifiers = [local.aws_iam_openid_connect_provider_arn]
     }
 
     condition {

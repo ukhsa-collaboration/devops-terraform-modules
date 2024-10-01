@@ -17,6 +17,6 @@ variable "region_name" {
 
 variable "service_prefix" {
   description = "The prefix to give to resources to allow multiple services to use the same AWS account"
-  type = "string"
-  default = ""  
+  type        = string
+  default     = ""  
 }

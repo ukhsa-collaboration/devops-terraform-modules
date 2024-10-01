@@ -44,3 +44,9 @@ variable "additional_allowed_repos" {
   }))
   default = {}
 }
+
+variable "create_openid_connect_provider" {
+  description = "Whether or not to create the openid_connect_provider resource. If this AWS account is being used to host multiservices, this should probably be false"
+  default     = true
+  type        = bool
+}

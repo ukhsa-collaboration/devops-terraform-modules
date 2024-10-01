@@ -13,11 +13,17 @@ data "tls_certificate" "this" {
 }
 
 resource "aws_iam_openid_connect_provider" "this" {
+  count           = var.create_openid_connect_provider ? 1 : 0
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = distinct(concat(data.tls_certificate.this.certificates[*].sha1_fingerprint, local.additional_thumbprints))
 
   tags = var.tags
+}
+
+moved {
+  from = aws_iam_openid_connect_provider.this
+  to   = aws_iam_openid_connect_provider.this[0]
 }
 
 resource "aws_iam_role" "this" {
@@ -61,7 +67,7 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
 }
 
 resource "aws_iam_policy" "this" {
-  name = "github-actions-oidc"
+  name = var.role_name
 
   policy = jsonencode({
     "Version" : "2012-10-17",

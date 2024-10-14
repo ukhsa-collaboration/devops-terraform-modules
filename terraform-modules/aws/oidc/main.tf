@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
       values   = ["https://token.actions.githubusercontent.com"]
     }
 
-      
+
     condition {
       test     = "ForAnyValue:StringLike"
       variable = "token.actions.githubusercontent.com:sub"

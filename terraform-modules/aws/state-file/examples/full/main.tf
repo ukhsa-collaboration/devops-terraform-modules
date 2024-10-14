@@ -52,7 +52,7 @@ resource "aws_kms_key_policy" "example" {
         ]
         Resource = "*"
       },
-    {
+      {
         Sid    = "Enable IAM User Permissions"
         Effect = "Allow"
         Principal = {

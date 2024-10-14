@@ -32,9 +32,9 @@ variable "iam_policy_arn" {
 }
 
 variable "additional_allowed_repos" {
-  description = "A map of additional Github repos and their audiences that can assume the AWS role"
+  description = "A map of additional Github repos and their subjects that can assume the AWS role"
   type = map(object({
-    aud = string
+    sub = string
   }))
   default = {}
 }

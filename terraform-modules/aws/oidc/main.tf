@@ -46,13 +46,20 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
     }
 
     condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:iss"
+      values   = ["https://token.actions.githubusercontent.com"]
+    }
+
+      
+    condition {
       test     = "ForAnyValue:StringLike"
       variable = "token.actions.githubusercontent.com:sub"
       values = concat(
         ["repo:${var.repo_name}:${var.allowed_refs}"],
         [
           for repo, details in var.additional_allowed_repos :
-          "repo:${repo}:${details.aud}"
+          "repo:${repo}:${details.sub}"
         ]
       )
 

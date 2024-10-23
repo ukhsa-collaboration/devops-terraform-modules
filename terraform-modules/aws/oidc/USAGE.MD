@@ -9,7 +9,7 @@ module "oidc" {
   source = "./"
 
   repo_name    = "UKHSA-Internal/<YOUR REPO NAME>"
-  allowed_refs = "repo:UKHSA-Internal/<YOUR REPO NAME>:environment:dev"
+  allowed_refs = "environment:dev"
 }
 ```
 

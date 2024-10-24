@@ -40,8 +40,8 @@ module "terraform_state" {
   policy                                   = data.aws_iam_policy_document.terraform_state_bucket.json
   attach_deny_insecure_transport_policy    = true
   attach_require_latest_tls_policy         = true
-  attach_deny_incorrect_encryption_headers = true
-  attach_deny_unencrypted_object_uploads   = true
+  attach_deny_incorrect_encryption_headers = false
+  attach_deny_unencrypted_object_uploads   = false
 
   allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
 
@@ -83,9 +83,8 @@ module "terraform_state_log" {
   attach_public_policy                     = true
   attach_deny_insecure_transport_policy    = true
   attach_require_latest_tls_policy         = true
-  attach_deny_incorrect_encryption_headers = true
-  attach_deny_incorrect_kms_key_sse        = true
-  attach_deny_unencrypted_object_uploads   = true
+  attach_deny_incorrect_encryption_headers = false
+  attach_deny_unencrypted_object_uploads   = false
 
   control_object_ownership = true
   object_ownership         = "BucketOwnerEnforced"

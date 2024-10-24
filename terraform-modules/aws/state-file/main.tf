@@ -1,5 +1,9 @@
 data "aws_caller_identity" "current" {}
 
+data "aws_iam_session_context" "current" {
+  arn = data.aws_caller_identity.current.arn
+}
+
 data "aws_iam_policy_document" "terraform_state_bucket" {
   statement {
     sid = "allow-user-list-access"
@@ -8,7 +12,7 @@ data "aws_iam_policy_document" "terraform_state_bucket" {
 
     principals {
       type        = "AWS"
-      identifiers = var.iam_principals
+      identifiers = distinct(concat(var.iam_principals, [data.aws_iam_session_context.current.issuer_arn]))
     }
 
     actions = [
@@ -36,8 +40,10 @@ module "terraform_state" {
   policy                                   = data.aws_iam_policy_document.terraform_state_bucket.json
   attach_deny_insecure_transport_policy    = true
   attach_require_latest_tls_policy         = true
-  attach_deny_incorrect_encryption_headers = true
-  attach_deny_unencrypted_object_uploads   = true
+  attach_deny_incorrect_encryption_headers = false
+  attach_deny_unencrypted_object_uploads   = false
+
+  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
 
   control_object_ownership = true
   object_ownership         = "BucketOwnerEnforced"
@@ -60,8 +66,8 @@ module "terraform_state" {
     rule = {
       #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
+        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
+        sse_algorithm     = "aws:kms"
       }
     }
   }
@@ -75,11 +81,11 @@ module "terraform_state_log" {
 
   attach_policy                            = true
   attach_public_policy                     = true
+  attach_access_log_delivery_policy        = true
   attach_deny_insecure_transport_policy    = true
   attach_require_latest_tls_policy         = true
-  attach_deny_incorrect_encryption_headers = true
-  attach_deny_incorrect_kms_key_sse        = true
-  attach_deny_unencrypted_object_uploads   = true
+  attach_deny_incorrect_encryption_headers = false
+  attach_deny_unencrypted_object_uploads   = false
 
   control_object_ownership = true
   object_ownership         = "BucketOwnerEnforced"
@@ -87,7 +93,7 @@ module "terraform_state_log" {
   access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
   access_log_delivery_policy_source_buckets  = [module.terraform_state.s3_bucket_arn]
 
-  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
+  allowed_kms_key_arn = "aws/s3"
 
   versioning = {
     enabled = true
@@ -95,10 +101,11 @@ module "terraform_state_log" {
 
   server_side_encryption_configuration = {
     rule = {
-      #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
+      #checkov:skip=CKV2_AWS_67:The destination bucket for logs must use the AWS-managed S3 key.
+      # See https://docs.aws.amazon.com/AmazonS3/latest/userguide/troubleshooting-server-access-logging.html#delivery-failures
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
+        kms_master_key_id = "aws/s3"
+        sse_algorithm     = "aws:kms"
       }
     }
   }

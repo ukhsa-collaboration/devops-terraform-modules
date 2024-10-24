@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "terraform_state_bucket" {
 
     principals {
       type        = "AWS"
-      identifiers = distinct(var.iam_principals, toset(data.aws_caller_identity.current.arn))
+      identifiers = distinct(concat(var.iam_principals, toset(data.aws_caller_identity.current.arn)))
     }
 
     actions = [

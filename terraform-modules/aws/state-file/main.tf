@@ -43,6 +43,8 @@ module "terraform_state" {
   attach_deny_incorrect_encryption_headers = true
   attach_deny_unencrypted_object_uploads   = true
 
+  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
+
   control_object_ownership = true
   object_ownership         = "BucketOwnerEnforced"
 
@@ -64,8 +66,8 @@ module "terraform_state" {
     rule = {
       #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "AES256" : "aws:kms"
+        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
+        sse_algorithm     = "aws:kms"
       }
     }
   }
@@ -91,7 +93,7 @@ module "terraform_state_log" {
   access_log_delivery_policy_source_accounts = [data.aws_caller_identity.current.account_id]
   access_log_delivery_policy_source_buckets  = [module.terraform_state.s3_bucket_arn]
 
-  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
+  allowed_kms_key_arn = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
 
   versioning = {
     enabled = true
@@ -101,8 +103,8 @@ module "terraform_state_log" {
     rule = {
       #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "AES256" : "aws:kms"
+        kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : "aws/s3"
+        sse_algorithm     = "aws:kms"
       }
     }
   }

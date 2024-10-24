@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "terraform_state_bucket" {
 
     principals {
       type        = "AWS"
-      identifiers = var.iam_principals
+      identifiers = distinct(var.iam_principals, data.aws_caller_identity.current.arn)
     }
 
     actions = [
@@ -61,7 +61,7 @@ module "terraform_state" {
       #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
       apply_server_side_encryption_by_default = {
         kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
+        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "AES256" : "aws:kms"
       }
     }
   }
@@ -98,7 +98,7 @@ module "terraform_state_log" {
       #checkov:skip=CKV2_AWS_67:Using a CMK is decided by the caller of the module and creating one is out-of-scope here.
       apply_server_side_encryption_by_default = {
         kms_master_key_id = length(var.state_bucket_kms_key_id) > 0 ? var.state_bucket_kms_key_id : null
-        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "aws:kms" : "AES256"
+        sse_algorithm     = length(var.state_bucket_kms_key_id) > 0 ? "AES256" : "aws:kms"
       }
     }
   }

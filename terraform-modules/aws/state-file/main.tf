@@ -81,6 +81,7 @@ module "terraform_state_log" {
 
   attach_policy                            = true
   attach_public_policy                     = true
+  attach_access_log_delivery_policy        = true
   attach_deny_insecure_transport_policy    = true
   attach_require_latest_tls_policy         = true
   attach_deny_incorrect_encryption_headers = false

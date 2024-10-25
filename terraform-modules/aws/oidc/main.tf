@@ -5,7 +5,7 @@ locals {
     "1c58a3a8518e8759bf075b76b750d4f2df264fcd"
   ]
 
-  iam_policy_arn = var.iam_policy_arn != "" ? var.iam_policy_arn : aws_iam_policy.this.arn
+  iam_policy_arn = var.iam_policy_arn != "" ? var.iam_policy_arn : aws_iam_policy.this[0].arn
 }
 
 data "tls_certificate" "this" {
@@ -68,6 +68,8 @@ data "aws_iam_policy_document" "iam_role_assume_role" {
 }
 
 resource "aws_iam_policy" "this" {
+  count = var.iam_policy_arn == "" ? 1 : 0
+
   name = "github-actions-oidc"
 
   policy = jsonencode({

@@ -18,8 +18,8 @@ variable "environment" {
   type        = string
 
   validation {
-    condition     = contains(["dev", "prod"], var.environment)
-    error_message = "The environment variable can only be set to 'dev' or 'prod'."
+    condition     = contains(["dev", "qat", "pre", "prd"], var.environment)
+    error_message = "The environment variable can only be set to 'dev', 'qat', 'pre' or 'prd'."
   }
 }
 

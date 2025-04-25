@@ -1,30 +1,3 @@
-# AWS Config Terraform Module
-
-This module sets up AWS Config in a given account, enabling recording of supported resource types and delivering configuration snapshots to an S3 bucket.
-
----
-
-## Features
-- Creates AWS Config service-linked role
-- Creates IAM role and attaches AWS-managed policies (unless a custom one is provided)
-- Enables the configuration recorder
-- Delivers snapshots to an existing S3 bucket
-- Outputs the recorder name and IAM role ARN
-
----
-
-## Usage
-
-```hcl
-module "aws_config" {
-  source = "./modules/aws_config" # or GitHub/registry source
-
-  audit_bucket_name               = "my-config-audit-bucket"
-  all_supported                   = true
-  include_global_resource_types   = true
-}
-```
-
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
@@ -69,9 +42,3 @@ No modules.
 | <a name="output_config_role_arn"></a> [config\_role\_arn](#output\_config\_role\_arn) | ARN of the IAM role used by AWS Config. |
 | <a name="output_recorder_name"></a> [recorder\_name](#output\_recorder\_name) | Name of the AWS Config recorder. |
 <!-- END_TF_DOCS -->
-
----
-
-## Notes
-- This module assumes the S3 bucket already exists and is properly permissioned for AWS Config.
-- See [AWS Config permissions requirements](https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-policy.html) for required bucket policy.

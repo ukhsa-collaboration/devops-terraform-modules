@@ -28,13 +28,16 @@ module "aws_config" {
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.11.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
 
 ## Modules
 
@@ -56,10 +59,8 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_all_supported"></a> [all\_supported](#input\_all\_supported) | Whether to record all supported AWS resource types. | `bool` | `true` | no |
 | <a name="input_audit_bucket_name"></a> [audit\_bucket\_name](#input\_audit\_bucket\_name) | Name of the S3 bucket where AWS Config will deliver configuration snapshots. Must exist with correct policy. | `string` | n/a | yes |
 | <a name="input_custom_config_role_arn"></a> [custom\_config\_role\_arn](#input\_custom\_config\_role\_arn) | Optional: ARN of a pre-created IAM role for AWS Config to use. If not set, this module will create one. | `string` | `null` | no |
-| <a name="input_include_global_resource_types"></a> [include\_global\_resource\_types](#input\_include\_global\_resource\_types) | Whether to include global resource types (like IAM). | `bool` | `true` | no |
 
 ## Outputs
 

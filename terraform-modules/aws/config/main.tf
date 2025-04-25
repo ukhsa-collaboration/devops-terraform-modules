@@ -32,8 +32,7 @@ resource "aws_config_configuration_recorder" "config_recorder" {
   role_arn = var.custom_config_role_arn != null ? var.custom_config_role_arn : aws_iam_role.config[0].arn
 
   recording_group {
-    all_supported                 = var.all_supported
-    include_global_resource_types = var.include_global_resource_types
+    all_supported = false
 
     exclusion_by_resource_types {
       resource_types = [
@@ -42,6 +41,10 @@ resource "aws_config_configuration_recorder" "config_recorder" {
         "AWS::IAM::Role",
         "AWS::IAM::User"
       ]
+    }
+
+    recording_strategy {
+      use_only = "EXCLUSION_BY_RESOURCE_TYPES"
     }
   }
 }

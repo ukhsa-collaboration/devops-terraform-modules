@@ -3,7 +3,7 @@ terraform {
 }
 
 locals {
-  mandatory_tags = toset([
+  mandatory_tag_names = toset([
     "lz-TechOwner",
     "lz-CostCode", 
     "lz-BillingOwner",
@@ -20,7 +20,7 @@ locals {
 
 # Data sources for mandatory universal tags
 data "aws_ssm_parameter" "mandatory_universal_tags" {
-  for_each =  local.mandatory_tags
+  for_each =  local.mandatory_tag_names
   
   name = "/tagging/mandatory/universal/${each.key}"
 }

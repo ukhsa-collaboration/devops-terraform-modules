@@ -3,34 +3,31 @@ terraform {
 }
 
 locals {
-  mandatory_tags = {
-    "lz-TechOwner"                        = var.lz_tech_owner
-    "lz-CostCode"                         = var.lz_cost_code
-    "lz-BillingOwner"                     = var.lz_billing_owner
-    "lz-BusinessOwner"                    = var.lz_business_owner
-    "lz-SupportTier"                      = var.lz_support_tier
-    "lz-GovernmentSecurityClassification" = var.lz_government_security_classification
-    "lz-Service"                          = var.lz_service
-    "lz-Environment"                      = var.lz_environment
-    "lz-Team"                             = var.lz_team
-    "lz-Notification"                     = var.lz_notification
-    "lz-LeanIXId"                         = var.lz_lean_ix_id
-  }
+  mandatory_tags = toset([
+    "lz-TechOwner",
+    "lz-CostCode", 
+    "lz-BillingOwner",
+    "lz-BusinessOwner",
+    "lz-SupportTier",
+    "lz-GovernmentSecurityClassification",
+    "lz-Service",
+    "lz-Environment",
+    "lz-Team",
+    "lz-Notification",
+    "lz-LeanIXId"
+  ])
+}
 
-  specific_mandatory_tags = {
-    "lz-BackupPlan" = var.lz_backup_plan
-  }
-
-  raw_optional_tags = {
-    "lz-GitCommitURL"       = var.lz_git_commit_url
-    "lz-Schedule"           = var.lz_schedule
-    "lz-DataClassification" = var.lz_data_classification
-    "lz-HealthData"         = var.lz_health_data
-  }
+# Data sources for mandatory universal tags
+data "aws_ssm_parameter" "mandatory_universal_tags" {
+  for_each =  local.mandatory_tags
   
-  optional_tags = {
-    for k, v in local.raw_optional_tags :
-    k => v if length(v) > 0
+  name = "/tagging/mandatory/universal/${each.key}"
+}
+
+locals {
+  mandatory_tags = {
+    for key in local.mandatory_tags : key => data.aws_ssm_parameter.mandatory_universal_tags[key].value
   }
 
   additional_tags = {
@@ -40,8 +37,6 @@ locals {
 
   all_tags = merge(
     local.mandatory_tags,
-    local.specific_mandatory_tags,
-    local.optional_tags,
     local.additional_tags
   )
 }

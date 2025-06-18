@@ -1,11 +1,40 @@
+terraform {
+  required_version = ">= 1.0" 
+}
+
 locals {
-  common_tags = {
-    "Project"     = var.project
-    "Client"      = var.client
-    "Owner"       = var.owner
-    "Terraform"   = true
-    "Environment" = var.environment
+  mandatory_tag_names = toset([
+    "lz-TechOwner",
+    "lz-CostCode", 
+    "lz-BillingOwner",
+    "lz-BusinessOwner",
+    "lz-SupportTier",
+    "lz-GovernmentSecurityClassification",
+    "lz-Service",
+    "lz-Environment",
+    "lz-Team",
+    "lz-Notification",
+    "lz-LeanIXId"
+  ])
+
+  mandatory_tags = {
+    for key in local.mandatory_tag_names : key => jsondecode(data.aws_ssm_parameter.mandatory_universal_tags[key].value)["default"]
   }
 
-  all_tags = merge(local.common_tags, var.additional_tags)
+  additional_tags = {
+    for k, v in var.additional_tags :
+    k => v if length(v) > 0
+  }
+
+  all_tags = merge(
+    local.mandatory_tags,
+    local.additional_tags
+  )
+}
+
+# Data sources for mandatory universal tags
+data "aws_ssm_parameter" "mandatory_universal_tags" {
+  for_each =  local.mandatory_tag_names
+  
+  name = "/tagging/mandatory/universal/${each.key}"
 }

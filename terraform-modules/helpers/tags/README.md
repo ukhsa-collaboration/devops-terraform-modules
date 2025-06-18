@@ -1,53 +1,36 @@
-# Terraform Tags Module
+<!-- BEGIN_TF_DOCS -->
+## Requirements
 
-This Terraform module provides a standardized set of tags that can be used across all AWS resources to ensure consistent tagging.
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 
-## Features
+## Providers
 
-- Provides a standardized set of tags including Project, Client, Owner, and Environment.
-- Ensures all resources managed by Terraform have a specific `Terraform` tag.
-- Allows additional custom tags.
+| Name | Version |
+|------|---------|
+| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
 
-## Usage
+## Modules
 
-```hcl
-module "tags" {
-  source = "git@github.com:UKHSA-Internal/devops-terraform-modules.git//terraform-modules/helpers/tags?ref=TF/helpers/tags/vALPHA_0.0.0"
+No modules.
 
-  project         = "MyProject"
-  client          = "ClientName"
-  owner           = "OwnerName"
-  environment     = "prod"
-  additional_tags = {
-    "CostCenter" = "IT-Dept"
-  }
-}
+## Resources
 
-# Example usage of tags module
-resource "aws_s3_bucket" "example_bucket" {
-  bucket = "my-tf-test-bucket"
-  acl    = "private"
-  
-  tags = module.tags.tags
-}
-```
+| Name | Type |
+|------|------|
+| [aws_ssm_parameter.mandatory_universal_tags](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ssm_parameter) | data source |
 
 ## Inputs
 
-| Name            | Description                                                       | Type           | Default | Required |
-| --------------- | ----------------------------------------------------------------- | -------------- | ------- | -------- |
-| `project`       | Project name to which the resource is associated                  | `string`       | n/a     | yes      |
-| `client`        | Client to which the resource is associated                        | `string`       | n/a     | yes      |
-| `owner`         | Owner of the resource                                             | `string`       | n/a     | yes      |
-| `environment`   | The environment for this deployment (e.g., dev, prod)             | `string`       | n/a     | yes      |
-| `additional_tags` | Any additional tags you want to add to AWS resources             | `map(string)`  | `{}`    | no       |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_additional_tags"></a> [additional\_tags](#input\_additional\_tags) | (Optional) Any additional tags you want to add to AWS resources | `map(string)` | `{}` | no |
 
 ## Outputs
 
-| Name    | Description                          |
-| ------- | ------------------------------------ |
-| `tags`  | The standardized set of tags         |
-
-## Constraints
-
-- The `environment` variable can only accept the values "dev" or "prod". Any other values will result in a Terraform error.
+| Name | Description |
+|------|-------------|
+| <a name="output_all"></a> [all](#output\_all) | A map of all tags to be applied to the resource including mandatory tags |
+| <a name="output_mandatory"></a> [mandatory](#output\_mandatory) | A map of only mandatory tags to be applied to the resource |
+<!-- END_TF_DOCS -->

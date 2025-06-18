@@ -16,18 +16,9 @@ locals {
     "lz-Notification",
     "lz-LeanIXId"
   ])
-}
 
-# Data sources for mandatory universal tags
-data "aws_ssm_parameter" "mandatory_universal_tags" {
-  for_each =  local.mandatory_tag_names
-  
-  name = "/tagging/mandatory/universal/${each.key}"
-}
-
-locals {
   mandatory_tags = {
-    for key in local.mandatory_tags : key => data.aws_ssm_parameter.mandatory_universal_tags[key].value
+    for key in local.mandatory_tag_names : key => data.aws_ssm_parameter.mandatory_universal_tags[key].value
   }
 
   additional_tags = {
@@ -39,4 +30,11 @@ locals {
     local.mandatory_tags,
     local.additional_tags
   )
+}
+
+# Data sources for mandatory universal tags
+data "aws_ssm_parameter" "mandatory_universal_tags" {
+  for_each =  local.mandatory_tag_names
+  
+  name = "/tagging/mandatory/universal/${each.key}"
 }

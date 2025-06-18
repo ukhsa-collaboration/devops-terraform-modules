@@ -18,7 +18,7 @@ locals {
   ])
 
   mandatory_tags = {
-    for key in local.mandatory_tag_names : key => data.aws_ssm_parameter.mandatory_universal_tags[key].value
+    for key in local.mandatory_tag_names : key => jsondecode(data.aws_ssm_parameter.mandatory_universal_tags[key].value)["default"]
   }
 
   additional_tags = {

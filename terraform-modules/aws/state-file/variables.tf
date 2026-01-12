@@ -10,6 +10,12 @@ variable "state_bucket_kms_key_id" {
   default     = ""
 }
 
+variable "create_dynamodb_table" {
+  description = "Whether to create the DynamoDB table used for Terraform state locking."
+  type        = bool
+  default     = true
+}
+
 variable "region_name" {
   description = "Name of the region that the state file is responsible for"
   type        = string

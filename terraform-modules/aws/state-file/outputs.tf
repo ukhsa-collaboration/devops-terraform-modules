@@ -14,11 +14,11 @@ output "s3_logging_bucket_arn" {
 }
 
 output "dynamodb_table_arn" {
-  value       = aws_dynamodb_table.terraform_locks.arn
-  description = "The ARN of the DynamoDB table"
+  value       = var.create_dynamodb_table ? aws_dynamodb_table.terraform_locks[0].arn : null
+  description = "The ARN of the DynamoDB table (null when create_dynamodb_table is false)"
 }
 
 output "dynamodb_table_name" {
-  value       = aws_dynamodb_table.terraform_locks.name
-  description = "The name of the DynamoDB table"
+  value       = var.create_dynamodb_table ? aws_dynamodb_table.terraform_locks[0].name : null
+  description = "The name of the DynamoDB table (null when create_dynamodb_table is false)"
 }

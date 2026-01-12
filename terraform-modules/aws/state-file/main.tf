@@ -115,6 +115,7 @@ module "terraform_state_log" {
 resource "aws_dynamodb_table" "terraform_locks" {
   # checkov:skip=CKV_AWS_28:The state lock table is ephemeral and doesn't need PITR.
   # checkov:skip=CKV_AWS_119:No data is contained in this table. Encrypting with CMK is unnecessary.
+  count        = var.create_dynamodb_table ? 1 : 0
   name         = "${var.region_name}-state-locks"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "LockID"

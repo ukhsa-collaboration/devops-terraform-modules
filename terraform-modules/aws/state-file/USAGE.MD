@@ -1,14 +1,15 @@
 # Bootstrapping AWS accounts for Terraform backend
 
-This Terraform module bootstraps an AWS account by creating an S3 bucket and a DynamoDB table, which are essential components for storing remote Terraform state files. Access to the S3 bucket is restricted to IAM users and roles passed in as `iam_principals` input variable list.
+This Terraform module bootstraps an AWS account by creating an S3 bucket and, by default, a DynamoDB table for state locking. Access to the S3 bucket is restricted to IAM users and roles passed in as `iam_principals` input variable list.
 
 ## Usage
 
 ```hcl
 module "bootstrap" {
   source = "./"
-  region               = "eu-west-1"
-  iam_principals       = ["arn:aws:iam::123456789012:user/example-user"]
+  region                = "eu-west-1"
+  iam_principals        = ["arn:aws:iam::123456789012:user/example-user"]
+  create_dynamodb_table = false
 }
 ```
 
@@ -65,3 +66,5 @@ terraform init \
   -backend-config=key=s3-backend-state/terraform.tfstate \
   -force-copy
 ```
+
+If you set `create_dynamodb_table = false`, skip the `dynamodb_table` backend config and use only the S3 backend.

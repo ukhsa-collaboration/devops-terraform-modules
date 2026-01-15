@@ -13,8 +13,8 @@ on:
       - 'terraform-modules/**/*.tf'
 
 env:
-  TERRAFORM_VERSION: "1.7.4"
-  TERRAFORM_DOCS_VERSION: "v0.17.0"
+  TERRAFORM_VERSION: "1.11.4"
+  TERRAFORM_DOCS_VERSION: "v0.20.0"
   PYTHON_VERSION: "3.12"
   CHECKOV_VERSION: "3.2.28"
   TF_MODULE_DIR: "terraform-modules" 

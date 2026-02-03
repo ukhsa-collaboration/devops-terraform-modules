@@ -30,8 +30,10 @@ No requirements.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_create_dynamodb_table"></a> [create\_dynamodb\_table](#input\_create\_dynamodb\_table) | Whether to create the DynamoDB table used for Terraform state locking. | `bool` | `true` | no |
+| <a name="input_create_terraform_state_log_bucket"></a> [create\_terraform\_state\_log\_bucket](#input\_create\_terraform\_state\_log\_bucket) | Whether or not to create the Terraform state log bucket | `bool` | `false` | no |
 | <a name="input_iam_principals"></a> [iam\_principals](#input\_iam\_principals) | A list of IAM user or role ARNs that will have access to the state S3 bucket | `list(string)` | n/a | yes |
 | <a name="input_region_name"></a> [region\_name](#input\_region\_name) | Name of the region that the state file is responsible for | `string` | n/a | yes |
+| <a name="input_s3_access_log_bucket_name"></a> [s3\_access\_log\_bucket\_name](#input\_s3\_access\_log\_bucket\_name) | The name of an existing S3 bucket to receive access logs when not creating a log bucket. | `string` | `""` | no |
 | <a name="input_state_bucket_kms_key_id"></a> [state\_bucket\_kms\_key\_id](#input\_state\_bucket\_kms\_key\_id) | The KMS key ID used to encrypt the S3 state bucket. Uses AWS-managed key if not specified. | `string` | `""` | no |
 
 ## Outputs

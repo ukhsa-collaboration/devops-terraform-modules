@@ -53,8 +53,7 @@ module "terraform_state" {
   }
 
   logging = {
-    target_bucket = module.terraform_state_log.s3_bucket_id
-    target_prefix = "log/"
+    target_bucket = var.create_terraform_state_log_bucket ? module.terraform_state_log[0].s3_bucket_id : var.s3_access_log_bucket_name
     target_object_key_format = {
       partitioned_prefix = {
         partition_date_source = "DeliveryTime"
@@ -76,6 +75,8 @@ module "terraform_state" {
 module "terraform_state_log" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "v4.1.2"
+
+  count = var.create_terraform_state_log_bucket ? 1 : 0
 
   bucket = "${data.aws_caller_identity.current.account_id}-${var.region_name}-state-logs"
 

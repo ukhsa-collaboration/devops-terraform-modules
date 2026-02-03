@@ -31,9 +31,4 @@ variable "s3_access_log_bucket_name" {
   description = "The name of an existing S3 bucket to receive access logs when not creating a log bucket."
   type        = string
   default     = ""
-
-  validation {
-    condition     = var.create_terraform_state_log_bucket || length(var.s3_access_log_bucket_name) > 0
-    error_message = "s3_access_log_bucket_name must be set when create_terraform_state_log_bucket is false."
-  }
 }
